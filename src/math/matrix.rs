@@ -10,7 +10,7 @@ impl<T> Matrix<T> {
         for i in 0..rows {
             let mut vector: Vec<T> = Vec::with_capacity(cols);
             for j in 0..cols {
-                vector[j] = initializer(i, j);
+                vector.push(initializer(i, j));
             }
             content.push(vector);
         }
