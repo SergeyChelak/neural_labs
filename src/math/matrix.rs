@@ -4,8 +4,10 @@ pub struct Matrix {
     content: Vec<Vec<f64>>
 }
 
+type MatrixInitializer = fn(usize, usize) -> f64;
+
 impl Matrix {
-    pub fn new<F>(rows: usize, cols: usize, initializer: F) -> Self where F: Fn(usize, usize) -> f64 {
+    pub fn new(rows: usize, cols: usize, initializer: MatrixInitializer) -> Self {
         let mut content: Vec<Vec<f64>> = Vec::with_capacity(rows);
         for i in 0..rows {
             let mut vector: Vec<f64> = Vec::with_capacity(cols);
@@ -29,6 +31,10 @@ impl Matrix {
 
     pub fn zero(rows: usize, cols: usize) -> Self {
         Self::new(rows, cols, |_, _| { 0.0 })
+    }
+
+    pub fn from_array(rows: usize, cols: usize, array: Vec<f64>) -> Self {
+        todo!()
     }
 
     pub fn rows(&self) -> &usize {
