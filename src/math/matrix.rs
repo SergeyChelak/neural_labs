@@ -4,10 +4,10 @@ pub struct Matrix {
     content: Vec<Vec<f64>>
 }
 
-type MatrixInitializer = fn(usize, usize) -> f64;
+type MatrixInitializer = dyn Fn(usize, usize) -> f64;
 
 impl Matrix {
-    pub fn new(rows: usize, cols: usize, initializer: MatrixInitializer) -> Self {
+    pub fn new(rows: usize, cols: usize, initializer: Box<MatrixInitializer>) -> Self {
         let mut content = vec![vec![0.0f64; cols]; rows];
         for i in 0..rows {
             for j in 0..cols {
@@ -21,18 +21,25 @@ impl Matrix {
         }
     }
 
-    pub fn new_square(dimension: usize, initializer: MatrixInitializer) -> Self {
+    pub fn new_square(dimension: usize, initializer: Box<MatrixInitializer>) -> Self {
         Self::new(dimension, dimension, initializer)
     }
 
     pub fn identity(dimension: usize) -> Self {
-        Self::new_square(dimension, |row, col| {
+        Self::new_square(dimension, Box::new(|row, col| {
             if row == col { 1.0 } else { 0.0 }
-        })
+        }))
+    }
+
+    pub fn diagonal(vector: Vec<f64>) -> Self {
+        let dimension = vector.len();
+        Self::new_square(dimension, Box::new(move |row, col| {
+            if row == col { vector[row] } else { 0.0 }
+        }))
     }
 
     pub fn zero(rows: usize, cols: usize) -> Self {
-        Self::new(rows, cols, |_, _| { 0.0 })
+        Self::new(rows, cols, Box::new(|_, _| { 0.0 }))
     }
 
     pub fn rows(&self) -> usize {
@@ -61,7 +68,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn create_zero_matrix() {
+    fn matrix_init_zero_matrix() {
         let matrix = Matrix::zero(2, 2);
         let zero_bits = 0.0f64.to_bits();
         for i in 0..matrix.rows {
@@ -72,7 +79,7 @@ mod tests {
     }
 
     #[test]
-    fn create_identity() {
+    fn matrix_init_identity() {
         let matrix = Matrix::identity(5);
         assert_eq!(matrix.rows(), matrix.cols(), "Matrix isn't square");
         for i in 0..matrix.rows() {
@@ -80,6 +87,25 @@ mod tests {
                 let value = matrix.get(i, j);
                 if i == j {
                     assert!(f64::abs(value - 1.0) < f64::EPSILON, "Diagonal element is not 1");
+                } else {
+                    assert!(f64::abs(value) < f64::EPSILON, "Non-diagonal element is not 0");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn matrix_init_diagonal() {
+        let diagonal_vector = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let clone = diagonal_vector.clone();
+        let matrix = Matrix::diagonal(diagonal_vector);
+        assert_eq!(matrix.rows(), clone.len(), "Incorrect rows count in diagonal matrix");
+        assert_eq!(matrix.cols(), clone.len(), "Incorrect cols count in diagonal matrix");
+        for i in 0..matrix.rows() {
+            for j in 0..matrix.cols() {
+                let value = matrix.get(i, j);
+                if i == j {
+                    assert!(f64::abs(value - clone[i]) < f64::EPSILON, "Non-diagonal element is not equals to correspoing item of initializer vector");
                 } else {
                     assert!(f64::abs(value) < f64::EPSILON, "Non-diagonal element is not 0");
                 }
