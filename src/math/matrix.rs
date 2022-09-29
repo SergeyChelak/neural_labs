@@ -8,13 +8,11 @@ type MatrixInitializer = fn(usize, usize) -> f64;
 
 impl Matrix {
     pub fn new(rows: usize, cols: usize, initializer: MatrixInitializer) -> Self {
-        let mut content: Vec<Vec<f64>> = Vec::with_capacity(rows);
+        let mut content = vec![vec![0.0f64; cols]; rows];
         for i in 0..rows {
-            let mut vector: Vec<f64> = Vec::with_capacity(cols);
             for j in 0..cols {
-                vector.push(initializer(i, j));
+                content[i][j] = initializer(i, j);
             }
-            content.push(vector);
         }
         Matrix {
             rows,
@@ -23,8 +21,12 @@ impl Matrix {
         }
     }
 
-    pub fn identity(rows: usize, cols: usize) -> Self {
-        Self::new(rows, cols, |row, col| {
+    pub fn new_square(dimension: usize, initializer: MatrixInitializer) -> Self {
+        Self::new(dimension, dimension, initializer)
+    }
+
+    pub fn identity(dimension: usize) -> Self {
+        Self::new_square(dimension, |row, col| {
             if row == col { 1.0 } else { 0.0 }
         })
     }
@@ -33,23 +35,55 @@ impl Matrix {
         Self::new(rows, cols, |_, _| { 0.0 })
     }
 
-    pub fn from_array(rows: usize, cols: usize, array: Vec<f64>) -> Self {
-        todo!()
+    pub fn rows(&self) -> usize {
+        self.rows
     }
 
-    pub fn rows(&self) -> &usize {
-        &self.rows
+    pub fn cols(&self) -> usize {
+        self.cols
     }
 
-    pub fn cols(&self) -> &usize {
-        &self.cols
+    pub fn get(&self, row: usize, col: usize) -> f64 {
+        self.content[row][col]
     }
 
-    pub fn get_unchecked(&self, row: usize, col: usize) -> &f64 {
-        &self.content[row][col]
-    }
-
-    pub fn set_unchecked(&mut self, row: usize, col: usize, value: f64) {
+    pub fn set(&mut self, row: usize, col: usize, value: f64) {
         self.content[row][col] = value;
+    }
+
+    pub fn is_square(&self) -> bool {
+        self.rows == self.cols
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn create_zero_matrix() {
+        let matrix = Matrix::zero(2, 2);
+        let zero_bits = 0.0f64.to_bits();
+        for i in 0..matrix.rows {
+            for j in 0..matrix.cols {
+                assert_eq!(matrix.get(i, j).to_bits(), zero_bits, "Zero matrix contains non-zero elements");
+            }
+        }
+    }
+
+    #[test]
+    fn create_identity() {
+        let matrix = Matrix::identity(5);
+        assert_eq!(matrix.rows(), matrix.cols(), "Matrix isn't square");
+        for i in 0..matrix.rows() {
+            for j in 0..matrix.cols() {
+                let value = matrix.get(i, j);
+                if i == j {
+                    assert!(f64::abs(value - 1.0) < f64::EPSILON, "Diagonal element is not 1");
+                } else {
+                    assert!(f64::abs(value) < f64::EPSILON, "Non-diagonal element is not 0");
+                }
+            }
+        }
     }
 }
