@@ -44,5 +44,13 @@ mod tests {
         ];
         let m2 = Matrix::from_vector(b);
         assert!(m1 != m2, "Matrices shouldn't be equal");
+
+
+        let b = vec![
+            vec![5.0, 2.0], 
+            vec![2.0, 3.0]
+        ];
+        let m2 = Matrix::from_vector(b);
+        assert!(m1 != m2, "Matrices shouldn't be equal");
     }
 }

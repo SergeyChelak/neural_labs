@@ -91,11 +91,7 @@ impl Matrix {
     pub fn set(&mut self, row: usize, col: usize, value: f64) {
         self.content[row][col] = value;
     }
-
-    pub fn is_square(&self) -> bool {
-        self.rows == self.cols
-    }
-
+    
     pub fn is_same_size(&self, other: &Matrix) -> bool {
         self.rows == other.rows && self.cols == other.cols
     }
