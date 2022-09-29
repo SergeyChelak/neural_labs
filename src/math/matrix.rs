@@ -102,25 +102,6 @@ impl Matrix {
     
 }
 
-impl PartialEq for Matrix {
-    fn eq(&self, other: &Self) -> bool {
-        if self.is_same_size(other) {
-            for i in 0..self.rows {
-                for j in 0..self.cols {
-                    if f64::abs(self.content[i][j] - other.content[i][j]) > f64::EPSILON {
-                        return false
-                    }
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Eq for Matrix { }
-
 #[cfg(test)]
 mod tests {
     use super::*;
