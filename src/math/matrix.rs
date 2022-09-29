@@ -21,6 +21,7 @@ fn rectangular_size<T>(vector: &Vec<Vec<T>>) -> Option<(usize, usize)> {
 }
 
 impl Matrix {
+    // initializers
     pub fn new(rows: usize, cols: usize, initializer: Box<MatrixInitializer>) -> Self {
         let mut content = vec![vec![0.0f64; cols]; rows];
         for i in 0..rows {
@@ -74,6 +75,7 @@ impl Matrix {
         Self::new(rows, cols, Box::new(|_, _| 0.0))
     }
 
+    // properties and accessors
     pub fn rows(&self) -> usize {
         self.rows
     }
@@ -93,7 +95,31 @@ impl Matrix {
     pub fn is_square(&self) -> bool {
         self.rows == self.cols
     }
+
+    pub fn is_same_size(&self, other: &Matrix) -> bool {
+        self.rows == other.rows && self.cols == other.cols
+    }
+    
 }
+
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        if self.is_same_size(other) {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    if f64::abs(self.content[i][j] - other.content[i][j]) > f64::EPSILON {
+                        return false
+                    }
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Eq for Matrix { }
 
 #[cfg(test)]
 mod tests {
