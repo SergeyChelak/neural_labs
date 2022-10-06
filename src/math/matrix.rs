@@ -22,11 +22,11 @@ fn rectangular_size<T>(vector: &Vec<Vec<T>>) -> Option<(usize, usize)> {
 
 impl Matrix {
     // initializers
-    pub fn new(rows: usize, cols: usize, initializer: Box<MatrixInitializer>) -> Self {
+    pub fn new<P>(rows: usize, cols: usize, producer: P) -> Self where P: Fn(usize, usize) -> f64 {
         let mut content = vec![vec![0.0f64; cols]; rows];
         for i in 0..rows {
             for j in 0..cols {
-                content[i][j] = initializer(i, j);
+                content[i][j] = producer(i, j);
             }
         }
         Matrix {

@@ -3,7 +3,11 @@ use super::matrix::Matrix;
 impl Matrix {
     pub fn is_square(&self) -> bool {
         self.rows() == self.cols()
-    }    
+    }
+    
+    pub fn dimensions(&self) -> (usize, usize) {
+        (self.rows(), self.cols())
+    }
 }
 
 #[cfg(test)]
