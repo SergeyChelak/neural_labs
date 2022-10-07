@@ -58,6 +58,13 @@ impl Matrix {
         }
         matrix
     }
+
+    pub fn transpose(&self) -> Matrix {
+        let (rows, cols) = self.dimensions();
+        Matrix::new(cols, rows, |i, j| {
+            self.get(j, i)
+        })
+    }
 }
 
 #[cfg(test)]
@@ -207,6 +214,9 @@ mod tests {
 
         let ab = Matrix::product(&a, &b);
         assert!(ab == expected, "Matrix product implemented incorrectly");
+
+        let identity = Matrix::identity(a.cols());
+        assert!(Matrix::product(&a, &identity) == a, "Matrix product identity should return the same matrix");
     }
 
     #[test]
@@ -228,5 +238,21 @@ mod tests {
             vec![1.0, 1.0, 2.0]
         ]);
         _ = Matrix::product(&a, &b);
+    }
+
+    #[test]
+    fn matrix_operation_transpose() {
+        let a = Matrix::from_vector(vec![
+            vec![1.0, 2.0, 3.0],
+            vec![4.0, 5.0, 6.0]
+        ]);
+
+        let expected = Matrix::from_vector(vec![
+            vec![1.0, 4.0],
+            vec![2.0, 5.0],
+            vec![3.0, 6.0]
+
+        ]);
+        assert!(a.transpose() == expected, "Matrix transpose implemented incorrectly");
     }
 }
