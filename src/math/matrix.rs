@@ -20,7 +20,7 @@ fn rectangular_size<T>(vector: &Vec<Vec<T>>) -> Option<(usize, usize)> {
 
 impl Matrix {
     // initializers
-    pub fn new<P>(rows: usize, cols: usize, producer: P) -> Self where P: Fn(usize, usize) -> f64 {
+    pub fn new<P>(rows: usize, cols: usize, mut producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
         let mut content = vec![vec![0.0f64; cols]; rows];
         for i in 0..rows {
             for j in 0..cols {
@@ -34,7 +34,7 @@ impl Matrix {
         }
     }
 
-    pub fn new_square<P>(dimension: usize, producer: P) -> Self where P: Fn(usize, usize) -> f64 {
+    pub fn new_square<P>(dimension: usize, producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
         Self::new(dimension, dimension, producer)
     }
 
