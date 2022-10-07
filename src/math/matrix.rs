@@ -102,12 +102,23 @@ mod tests {
 
     #[test]
     fn matrix_init_new() {
-        todo!("Not covered")
+        let (rows, cols) = (4usize, 8usize);
+        let m = Matrix::new(rows, cols, |i, j| (i * rows + j) as f64);
+        assert!(m.rows == rows, "Matrix initialized with incorrect row value");
+        assert!(m.cols == cols, "Matrix initialized with incorrect column value");
+        for i in 0..rows {
+            for j in 0..cols {
+                let value = (i * rows + j) as f64;
+                assert_eq!(m.get(i, j), value, "Unexpected matrix value");
+            }
+        }
     }
 
     #[test]
     fn matrix_init_square() {
-        todo!("Not covered")
+        let dim: usize = 4;
+        let m = Matrix::new_square(dim, |_, _| 0.0);
+        assert_eq!(m.rows, m.cols, "Matrix is not square")
     }
 
     #[test]
