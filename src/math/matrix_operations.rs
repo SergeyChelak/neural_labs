@@ -59,11 +59,20 @@ impl Matrix {
         matrix
     }
 
-    pub fn transpose(&self) -> Matrix {
+    pub fn transposed(&self) -> Matrix {
         let (rows, cols) = self.dimensions();
         Matrix::new(cols, rows, |i, j| {
             self.get(j, i)
         })
+    }
+
+    pub fn mul(&mut self, scalar: f64) {
+        for i in 0..self.rows() {
+            for j in 0..self.cols() {
+                let value = self.get(i, j) * scalar;
+                self.set(i, j, value);
+            }
+        }
     }
 }
 
@@ -241,7 +250,7 @@ mod tests {
     }
 
     #[test]
-    fn matrix_operation_transpose() {
+    fn matrix_operation_transposed() {
         let a = Matrix::from_vector(vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0]
@@ -253,6 +262,25 @@ mod tests {
             vec![3.0, 6.0]
 
         ]);
-        assert!(a.transpose() == expected, "Matrix transpose implemented incorrectly");
+        assert!(a.transposed() == expected, "Matrix transpose implemented incorrectly");
+    }
+
+    #[test]
+    fn matrix_operation_scalar_multiplication() {
+        let mut m = Matrix::from_vector(vec![
+            vec![1.0, 2.0, 3.0],
+            vec![4.0, 5.0, 6.0],
+            vec![7.0, 8.0, 9.0]
+        ]);
+
+        let expected = Matrix::from_vector(vec![
+            vec![ 2.0,  4.0,  6.0],
+            vec![ 8.0, 10.0, 12.0],
+            vec![14.0, 16.0, 18.0]
+        ]);
+
+        m.mul(2.0);
+
+        assert!(m == expected, "Matrix scalar multiplication implemented incorrectly");
     }
 }
