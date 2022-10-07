@@ -4,8 +4,6 @@ pub struct Matrix {
     content: Vec<Vec<f64>>,
 }
 
-type MatrixInitializer = dyn Fn(usize, usize) -> f64;
-
 fn rectangular_size<T>(vector: &Vec<Vec<T>>) -> Option<(usize, usize)> {
     let rows = vector.len();
     if rows == 0 {
@@ -36,22 +34,22 @@ impl Matrix {
         }
     }
 
-    pub fn new_square(dimension: usize, initializer: Box<MatrixInitializer>) -> Self {
-        Self::new(dimension, dimension, initializer)
+    pub fn new_square<P>(dimension: usize, producer: P) -> Self where P: Fn(usize, usize) -> f64 {
+        Self::new(dimension, dimension, producer)
     }
 
     pub fn identity(dimension: usize) -> Self {
         Self::new_square(
             dimension,
-            Box::new(|row, col| if row == col { 1.0 } else { 0.0 }),
+            |row, col| if row == col { 1.0 } else { 0.0 }
         )
     }
 
-    pub fn diagonal(vector: Vec<f64>) -> Self {
+    pub fn diagonal(vector: &Vec<f64>) -> Self {
         let dimension = vector.len();
         Self::new_square(
             dimension,
-            Box::new(move |row, col| if row == col { vector[row] } else { 0.0 }),
+            |row, col| if row == col { vector[row] } else { 0.0 }
         )
     }
 
@@ -103,6 +101,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn matrix_init_new() {
+        todo!("Not covered")
+    }
+
+    #[test]
+    fn matrix_init_square() {
+        todo!("Not covered")
+    }
+
+    #[test]
     fn matrix_init_zero_matrix() {
         let matrix = Matrix::zero(2, 2);
         let zero_bits = 0.0f64.to_bits();
@@ -143,7 +151,7 @@ mod tests {
     fn matrix_init_diagonal() {
         let diagonal_vector = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
         let clone = diagonal_vector.clone();
-        let matrix = Matrix::diagonal(diagonal_vector);
+        let matrix = Matrix::diagonal(&diagonal_vector);
         assert_eq!(
             matrix.rows(),
             clone.len(),
