@@ -19,12 +19,14 @@ impl Matrix {
         })
     }
 
-    pub fn add(&mut self, other: &Matrix) {
-        self.modify_with_binary_operation(other, |x, y| x + y)
+    pub fn add(&mut self, other: &Matrix) -> &Matrix {
+        self.modify_with_binary_operation(other, |x, y| x + y);
+        self
     }
 
-    pub fn sub(&mut self, other: &Matrix) {
-        self.modify_with_binary_operation(other, |x, y| x - y)
+    pub fn sub(&mut self, other: &Matrix) -> &Matrix {
+        self.modify_with_binary_operation(other, |x, y| x - y);
+        self
     }
 
     fn modify_with_binary_operation<Operation>(&mut self, other: &Matrix, operation: Operation) where Operation : Fn(f64, f64) -> f64 {
@@ -66,13 +68,14 @@ impl Matrix {
         })
     }
 
-    pub fn mul(&mut self, scalar: f64) {
+    pub fn mul(&mut self, scalar: f64) -> &Matrix {
         for i in 0..self.rows() {
             for j in 0..self.cols() {
                 let value = self.get(i, j) * scalar;
                 self.set(i, j, value);
             }
         }
+        self
     }
 }
 
@@ -279,8 +282,6 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ]);
 
-        m.mul(2.0);
-
-        assert!(m == expected, "Matrix scalar multiplication implemented incorrectly");
+        assert!(*m.mul(2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
     }
 }
