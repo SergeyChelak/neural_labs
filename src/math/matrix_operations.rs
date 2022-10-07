@@ -39,6 +39,25 @@ impl Matrix {
             }
         }
     }
+        
+    pub fn product(first: &Matrix, second: &Matrix) -> Matrix {
+        let (rows, fc) = first.dimensions();
+        let (sr, cols) = second.dimensions();
+        if fc != sr {
+            panic!("Product operation is't applicable for matrices with dimensions {}x{} and {}x{}", rows, fc, sr, cols)
+        }
+        let mut matrix = Matrix::zero(rows, cols);
+        for i in 0..rows {            
+            for j in 0..cols {
+                let mut sum = 0.0f64;
+                for k in 0..fc {
+                    sum += first.get(i, k) * second.get(k, j);
+                }
+                matrix.set(i, j, sum);
+            }
+        }
+        matrix
+    }
 }
 
 #[cfg(test)]
@@ -139,5 +158,75 @@ mod tests {
 
         m1.sub(&m2);
         assert!(m1 == expected, "Matrix sub implemeted incorrectly")
+    }
+
+    #[test]
+    fn matrix_operation_product() {
+        let a = Matrix::from_vector(vec![
+            vec![1.0, 0.0, 1.0],
+            vec![2.0, 1.0, 1.0],
+            vec![0.0, 1.0, 1.0],
+            vec![1.0, 1.0, 2.0]
+
+        ]);
+
+        let b = Matrix::from_vector(vec![
+            vec![1.0, 2.0, 1.0],
+            vec![2.0, 3.0, 1.0],
+            vec![4.0, 2.0, 2.0]
+        ]);
+
+        let expected = Matrix::from_vector(vec![
+            vec![ 5.0, 4.0, 3.0],
+            vec![ 8.0, 9.0, 5.0],
+            vec![ 6.0, 5.0, 3.0],
+            vec![11.0, 9.0, 6.0]
+
+        ]);
+
+        let ab = Matrix::product(&a, &b);
+        assert!(ab == expected, "Matrix product implemented incorrectly");
+
+        let a = Matrix::from_vector(vec![
+            vec![1.0, 2.0, 3.0],
+            vec![4.0, 5.0, 6.0],
+
+        ]);
+
+        let b = Matrix::from_vector(vec![
+            vec![ 7.0,  8.0],
+            vec![ 9.0, 10.0],
+            vec![11.0, 12.0]
+        ]);
+
+        let expected = Matrix::from_vector(vec![
+            vec![ 58.0,  64.0],
+            vec![139.0, 154.0]
+
+        ]);
+
+        let ab = Matrix::product(&a, &b);
+        assert!(ab == expected, "Matrix product implemented incorrectly");
+    }
+
+    #[test]
+    #[should_panic]
+    fn matrix_operation_product_failure() {
+        let a = Matrix::from_vector(vec![
+            vec![1.0, 0.0, 1.0],
+            vec![2.0, 1.0, 1.0],
+            vec![0.0, 1.0, 1.0],
+            vec![1.0, 1.0, 2.0]
+
+        ]);
+
+        let b = Matrix::from_vector(vec![
+            vec![1.0, 0.0, 1.0],
+            vec![2.0, 1.0, 1.0],
+            vec![0.0, 1.0, 1.0],
+            vec![1.0, 1.0, 2.0],
+            vec![1.0, 1.0, 2.0]
+        ]);
+        _ = Matrix::product(&a, &b);
     }
 }
