@@ -1,6 +1,16 @@
 use super::matrix::Matrix;
 
 impl Matrix {
+    pub fn map<Func>(&mut self, mut f: Func) -> &Matrix where Func: FnMut(usize, usize, f64) -> f64 {
+        for i in 0..self.rows() {
+            for j in 0..self.cols() {
+                let value = f(i, j, self.get(i, j));
+                self.set(i, j, value);
+            }
+        }
+        self
+    }
+
     pub fn plus<'a>(first: &'a Matrix, second: &'a Matrix) -> Matrix {
         Self::new_with_binary_operation(first, second, |x, y| x + y)        
     }
@@ -20,28 +30,23 @@ impl Matrix {
     }
 
     pub fn add(&mut self, other: &Matrix) -> &Matrix {
-        self.modify_with_binary_operation(other, |x, y| x + y);
-        self
+        if !self.is_same_size(&other) {
+            panic!("Can't sum matrices with different size")
+        }
+        self.map(|i, j, value| {
+            value + other.get(i, j)
+        })
     }
 
     pub fn sub(&mut self, other: &Matrix) -> &Matrix {
-        self.modify_with_binary_operation(other, |x, y| x - y);
-        self
+        if !self.is_same_size(&other) {
+            panic!("Can't subtract matrices with different size")
+        }
+        self.map(|i, j, value| {
+            value - other.get(i, j)
+        })
     }
 
-    fn modify_with_binary_operation<Operation>(&mut self, other: &Matrix, operation: Operation) where Operation : Fn(f64, f64) -> f64 {
-        if !self.is_same_size(&other) {
-            panic!("Matrices should be the same size")
-        }
-        let (rows, cols) = self.dimensions();
-        for i in 0..rows {
-            for j in 0..cols {
-                let value = operation(self.get(i, j), other.get(i, j));
-                self.set(i, j, value);
-            }
-        }
-    }
-        
     pub fn product(first: &Matrix, second: &Matrix) -> Matrix {
         let (rows, fc) = first.dimensions();
         let (sr, cols) = second.dimensions();
@@ -69,13 +74,7 @@ impl Matrix {
     }
 
     pub fn mul(&mut self, scalar: f64) -> &Matrix {
-        for i in 0..self.rows() {
-            for j in 0..self.cols() {
-                let value = self.get(i, j) * scalar;
-                self.set(i, j, value);
-            }
-        }
-        self
+        self.map(|_, _, v| v * scalar)
     }
 }
 
