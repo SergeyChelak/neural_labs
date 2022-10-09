@@ -1,7 +1,7 @@
 use super::matrix::Matrix;
 
 impl Matrix {
-    pub fn map<Func>(&mut self, mut f: Func) -> &Matrix where Func: FnMut(usize, usize, f64) -> f64 {
+    pub fn map<Func>(&mut self, f: Func) -> &mut Matrix where Func: Fn(usize, usize, f64) -> f64 {
         for i in 0..self.rows() {
             for j in 0..self.cols() {
                 let value = f(i, j, self.get(i, j));
@@ -29,7 +29,7 @@ impl Matrix {
         })
     }
 
-    pub fn add(&mut self, other: &Matrix) -> &Matrix {
+    pub fn add(&mut self, other: &Matrix) -> &mut Matrix {
         if !self.is_same_size(&other) {
             panic!("Can't sum matrices with different size")
         }
@@ -38,7 +38,7 @@ impl Matrix {
         })
     }
 
-    pub fn sub(&mut self, other: &Matrix) -> &Matrix {
+    pub fn sub(&mut self, other: &Matrix) -> &mut Matrix {
         if !self.is_same_size(&other) {
             panic!("Can't subtract matrices with different size")
         }
@@ -73,7 +73,7 @@ impl Matrix {
         })
     }
 
-    pub fn mul(&mut self, scalar: f64) -> &Matrix {
+    pub fn mul(&mut self, scalar: f64) -> &mut Matrix {
         self.map(|_, _, v| v * scalar)
     }
 }
@@ -281,6 +281,6 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ]);
 
-        assert!(*m.mul(2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
+        assert!(m.mul(2.0) == &expected, "Matrix scalar multiplication implemented incorrectly");
     }
 }
