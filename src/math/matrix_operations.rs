@@ -10,7 +10,7 @@ impl Matrix {
         Self::map(first, second, |x, y| x - y)        
     }
 
-    fn map<'a, Operation>(first: &Matrix, second: &Matrix, operation: Operation) -> Self where Operation : Fn(f64, f64) -> f64 {
+    fn map<Operation>(first: &Matrix, second: &Matrix, operation: Operation) -> Self where Operation : Fn(f64, f64) -> f64 {
         if !first.is_same_size(&second) {
             panic!("Matrices should be the same size")
         }
