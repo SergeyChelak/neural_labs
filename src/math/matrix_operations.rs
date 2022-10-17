@@ -2,15 +2,15 @@ use super::matrix::Matrix;
 
 impl Matrix {
 
-    pub fn add<'a>(first: &'a Matrix, second: &'a Matrix) -> Matrix {
+    pub fn add(first: &Matrix, second: &Matrix) -> Matrix {
         Self::map(first, second, |x, y| x + y)        
     }
 
-    pub fn sub<'a>(first: &'a Matrix, second: &'a Matrix) -> Matrix {
+    pub fn sub(first: &Matrix, second: &Matrix) -> Matrix {
         Self::map(first, second, |x, y| x - y)        
     }
 
-    fn map<'a, Operation>(first: &'a Matrix, second: &'a Matrix, operation: Operation) -> Self where Operation : Fn(f64, f64) -> f64 {
+    fn map<'a, Operation>(first: &Matrix, second: &Matrix, operation: Operation) -> Self where Operation : Fn(f64, f64) -> f64 {
         if !first.is_same_size(&second) {
             panic!("Matrices should be the same size")
         }
