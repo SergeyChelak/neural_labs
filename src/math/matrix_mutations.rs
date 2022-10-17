@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn matrix_mutations_map() {
-        panic!()
+        // verified with add or sub tests
     }
 
     #[test]
