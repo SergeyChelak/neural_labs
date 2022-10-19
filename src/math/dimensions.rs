@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct Dimensions {
     rows: usize,
     cols: usize,
@@ -56,18 +57,18 @@ mod tests {
 
     #[test]
     fn dimensions_init_from_vector() {
-        // let v = vec![vec![1, 2, 3], vec![2, 3, 4]];
-        // assert_eq!(rectangular_size(&v), Some((2, 3)));
+        let v = vec![vec![1, 2, 3], vec![2, 3, 4]];
+        assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(2, 3)));
 
-        // let v: Vec<Vec<()>> = vec![];
-        // assert_eq!(rectangular_size(&v), Some((0, 0)));
+        let v: Vec<Vec<()>> = vec![];
+        assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(0, 0)));
 
-        // let v = vec![vec![1, 2, 3], vec![2, 3]];
-        // assert_eq!(rectangular_size(&v), None);
+        let v = vec![vec![1, 2, 3], vec![2, 3]];
+        assert_eq!(Dimensions::from_vector(&v), Err(()));
 
-        // let v: Vec<Vec<()>> = vec![
-        //     vec![()]
-        // ];
-        // assert_eq!(rectangular_size(&v), Some((1, 1)));
+        let v: Vec<Vec<()>> = vec![
+            vec![()]
+        ];
+        assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(1, 1)));
     }
 }
