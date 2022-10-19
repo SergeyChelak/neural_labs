@@ -12,7 +12,7 @@ impl Dimensions {
         Self::new(dim, dim)
     }
 
-    pub fn from_vector(vec: &Vec<Vec<f64>>) -> Result<Self, ()> {
+    pub fn from_vector<T>(vec: &Vec<Vec<T>>) -> Result<Self, ()> {
         let rows = vec.len();
         if rows == 0 {
             return Ok(Self::new(0, 0))
