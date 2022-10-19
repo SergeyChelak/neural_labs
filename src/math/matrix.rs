@@ -1,21 +1,8 @@
-pub struct Matrix {
-    rows: usize,
-    cols: usize,
-    content: Vec<Vec<f64>>,
-}
+use super::dimensions::Dimensions;
 
-fn rectangular_size<T>(vector: &Vec<Vec<T>>) -> Option<(usize, usize)> {
-    let rows = vector.len();
-    if rows == 0 {
-        return Some((0, 0));
-    }
-    let cols = vector[0].len();
-    for i in 1..rows {
-        if vector[i].len() != cols {
-            return None;
-        }
-    }
-    return Some((rows, cols));
+pub struct Matrix {
+    dimensions: Dimensions,
+    content: Vec<Vec<f64>>,
 }
 
 impl Matrix {
@@ -28,9 +15,8 @@ impl Matrix {
             }
         }
         Matrix {
-            rows,
-            cols,
-            content,
+            dimensions: Dimensions::new(rows, cols),
+            content: content,
         }
     }
 
@@ -54,11 +40,10 @@ impl Matrix {
     }
 
     pub fn from_vector(vector: Vec<Vec<f64>>) -> Self {
-        if let Some(dims) = rectangular_size(&vector) {
-            Matrix {
-                rows: dims.0,
-                cols: dims.1,
-                content: vector,
+        if let Ok(dims) = Dimensions::from_vector(&vector) {
+            return Matrix {
+                dimensions: dims,
+                content: vector 
             }
         } else {
             panic!("Initializer vector must be rectangular")
@@ -75,11 +60,11 @@ impl Matrix {
 
     // properties and accessors
     pub fn rows(&self) -> usize {
-        self.rows
+        self.dimensions.rows()
     }
 
     pub fn cols(&self) -> usize {
-        self.cols
+        self.dimensions.cols()
     }
 
     pub fn get(&self, row: usize, col: usize) -> f64 {
@@ -91,7 +76,7 @@ impl Matrix {
     }
     
     pub fn is_same_size(&self, other: &Matrix) -> bool {
-        self.rows == other.rows && self.cols == other.cols
+        self.dimensions == other.dimensions
     }
     
 }
@@ -104,8 +89,8 @@ mod tests {
     fn matrix_init_new() {
         let (rows, cols) = (4usize, 8usize);
         let m = Matrix::new(rows, cols, |i, j| (i * rows + j) as f64);
-        assert!(m.rows == rows, "Matrix initialized with incorrect row value");
-        assert!(m.cols == cols, "Matrix initialized with incorrect column value");
+        assert!(m.rows() == rows, "Matrix initialized with incorrect row value");
+        assert!(m.cols() == cols, "Matrix initialized with incorrect column value");
         for i in 0..rows {
             for j in 0..cols {
                 let value = (i * rows + j) as f64;
@@ -118,15 +103,15 @@ mod tests {
     fn matrix_init_square() {
         let dim: usize = 4;
         let m = Matrix::new_square(dim, |_, _| 0.0);
-        assert_eq!(m.rows, m.cols, "Matrix is not square")
+        assert_eq!(m.rows(), m.cols(), "Matrix is not square")
     }
 
     #[test]
     fn matrix_init_zero_matrix() {
         let matrix = Matrix::zero(2, 2);
         let zero_bits = 0.0f64.to_bits();
-        for i in 0..matrix.rows {
-            for j in 0..matrix.cols {
+        for i in 0..matrix.rows() {
+            for j in 0..matrix.cols() {
                 assert_eq!(
                     matrix.get(i, j).to_bits(),
                     zero_bits,
@@ -196,8 +181,8 @@ mod tests {
         ];
         let clone = v.clone();
         let matrix = Matrix::from_vector(v);
-        assert_eq!(matrix.rows, 2, "Incorrect rows count");
-        assert_eq!(matrix.cols, 3, "Incorrect cols count");
+        assert_eq!(matrix.rows(), 2, "Incorrect rows count");
+        assert_eq!(matrix.cols(), 3, "Incorrect cols count");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
                 assert_eq!(matrix.get(i, j), clone[i][j], "Value of matrix doesn't respond to original value");
@@ -213,22 +198,5 @@ mod tests {
             vec![2.0, 3.0]
         ];
         _ = Matrix::from_vector(v);
-    }
-
-    #[test]
-    fn utils_rectangluar_size() {
-        let v = vec![vec![1, 2, 3], vec![2, 3, 4]];
-        assert_eq!(rectangular_size(&v), Some((2, 3)));
-
-        let v: Vec<Vec<()>> = vec![];
-        assert_eq!(rectangular_size(&v), Some((0, 0)));
-
-        let v = vec![vec![1, 2, 3], vec![2, 3]];
-        assert_eq!(rectangular_size(&v), None);
-
-        let v: Vec<Vec<()>> = vec![
-            vec![()]
-        ];
-        assert_eq!(rectangular_size(&v), Some((1, 1)));
     }
 }
