@@ -201,4 +201,28 @@ mod tests {
         ];
         _ = Matrix::from_vector(&v);
     }
+
+    #[test]
+    fn matrix_get_set() -> Result<(), ()> {
+        let vector = vec![
+            vec![1.2, 2.3, 3.4, 6.1],
+            vec![4.5, 5.6, 6.7, 5.2],
+            vec![7.8, 8.9, 9.0, 4.3],
+        ];
+        let dims = Dimensions::from_vector(&vector)?;
+        let mut m = Matrix::zero(dims.rows(), dims.cols());
+        // 
+        for i in 0..dims.rows() {
+            for j in 0..dims.cols() {
+                m.set(i, j, vector[i][j]);
+            }
+        }
+        // 
+        for i in 0..dims.rows() {
+            for j in 0..dims.cols() {
+                assert_eq!(m.get(i, j), vector[i][j]);
+            }
+        }
+        Ok(())
+    }
 }
