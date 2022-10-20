@@ -55,14 +55,13 @@ impl Matrix {
     }
 
     pub fn zero(rows: usize, cols: usize) -> Self {
-        Self::new(rows, cols, Box::new(|_, _| 0.0))
+        Self::new(rows, cols, |_, _| 0.0)
     }
 
     // properties and accessors
     pub fn dimensions(&self) -> Dimensions {
         self.dimensions
     }
-
 
     pub fn rows(&self) -> usize {
         self.dimensions.rows()
