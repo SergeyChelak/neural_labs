@@ -59,6 +59,11 @@ impl Matrix {
     }
 
     // properties and accessors
+    pub fn dimensions(&self) -> Dimensions {
+        self.dimensions
+    }
+
+
     pub fn rows(&self) -> usize {
         self.dimensions.rows()
     }

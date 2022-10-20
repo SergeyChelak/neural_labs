@@ -14,15 +14,15 @@ impl Matrix {
         if !first.is_same_size(&second) {
             panic!("Matrices should be the same size")
         }
-        let (rows, cols) = first.dimensions();
+        let (rows, cols) = (first.rows(), first.cols());
         Matrix::new(rows, cols, |i: usize, j: usize| {
             operation(first.get(i, j), second.get(i, j))
         })
     }
 
     pub fn product(first: &Matrix, second: &Matrix) -> Matrix {
-        let (rows, fc) = first.dimensions();
-        let (sr, cols) = second.dimensions();
+        let (rows, fc) = (first.rows(), first.cols());
+        let (sr, cols) = (second.rows(), second.cols());
         if fc != sr {
             panic!("Product operation is't applicable for matrices with dimensions {}x{} and {}x{}", rows, fc, sr, cols)
         }
@@ -40,7 +40,7 @@ impl Matrix {
     }
 
     pub fn transposed(&self) -> Matrix {
-        let (rows, cols) = self.dimensions();
+        let (rows, cols) = (self.rows(), self.cols());
         Matrix::new(cols, rows, |i, j| {
             self.get(j, i)
         })

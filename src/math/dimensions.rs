@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Dimensions {
     rows: usize,
     cols: usize,
@@ -6,7 +6,7 @@ pub struct Dimensions {
 
 impl Dimensions {
     pub fn new(rows: usize, cols: usize) -> Self {
-        Self{rows, cols}
+        Self { rows, cols }
     }
 
     pub fn square(dim: usize) -> Self {
@@ -16,12 +16,12 @@ impl Dimensions {
     pub fn from_vector<T>(vec: &Vec<Vec<T>>) -> Result<Self, ()> {
         let rows = vec.len();
         if rows == 0 {
-            return Ok(Self::new(0, 0))
+            return Ok(Self::new(0, 0));
         }
         let cols = vec[0].len();
         for i in 1..rows {
             if vec[i].len() != cols {
-                return Err(())
+                return Err(());
             }
         }
         Ok(Self::new(rows, cols))
@@ -29,6 +29,10 @@ impl Dimensions {
 
     pub fn is_valid_position(&self, row: usize, col: usize) -> bool {
         row < self.rows && col < self.cols
+    }
+
+    pub fn is_square(&self) -> bool {
+        self.rows == self.cols
     }
 
     pub fn rows(&self) -> usize {
@@ -50,7 +54,6 @@ impl Eq for Dimensions {
     //
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -66,9 +69,16 @@ mod tests {
         let v = vec![vec![1, 2, 3], vec![2, 3]];
         assert_eq!(Dimensions::from_vector(&v), Err(()));
 
-        let v: Vec<Vec<()>> = vec![
-            vec![()]
-        ];
+        let v: Vec<Vec<()>> = vec![vec![()]];
         assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(1, 1)));
+    }
+
+    #[test]
+    fn dimensions_is_square() {
+        let d = Dimensions::new(3, 5);
+        assert!(!d.is_square(), "Dims are not square");
+
+        let d = Dimensions::new(5, 5);
+        assert!(d.is_square(), "Dims expected to be square");
     }
 }
