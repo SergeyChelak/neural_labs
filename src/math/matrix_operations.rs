@@ -54,19 +54,19 @@ mod tests {
 
     #[test]
     fn matrix_operation_plus() {
-        let m1 = Matrix::from_vector(vec![
+        let m1 = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
         ]);
 
-        let m2 = Matrix::from_vector(vec![
+        let m2 = Matrix::from_vector(&vec![
             vec![9.0, 8.0, 7.0],
             vec![6.0, 5.0, 4.0],
             vec![3.0, 2.0, 1.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![10.0, 10.0, 10.0],
             vec![10.0, 10.0, 10.0],
             vec![10.0, 10.0, 10.0]
@@ -78,19 +78,19 @@ mod tests {
 
     #[test]
     fn matrix_operation_minus() {
-        let m1 = Matrix::from_vector(vec![
+        let m1 = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
         ]);
 
-        let m2 = Matrix::from_vector(vec![
+        let m2 = Matrix::from_vector(&vec![
             vec![9.0, 8.0, 7.0],
             vec![6.0, 5.0, 4.0],
             vec![3.0, 2.0, 1.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![-8.0, -6.0, -4.0],
             vec![-2.0,  0.0,  2.0],
             vec![ 4.0,  6.0,  8.0]
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn matrix_operation_product() {
-        let a = Matrix::from_vector(vec![
+        let a = Matrix::from_vector(&vec![
             vec![1.0, 0.0, 1.0],
             vec![2.0, 1.0, 1.0],
             vec![0.0, 1.0, 1.0],
@@ -110,13 +110,13 @@ mod tests {
 
         ]);
 
-        let b = Matrix::from_vector(vec![
+        let b = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 1.0],
             vec![2.0, 3.0, 1.0],
             vec![4.0, 2.0, 2.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![ 5.0, 4.0, 3.0],
             vec![ 8.0, 9.0, 5.0],
             vec![ 6.0, 5.0, 3.0],
@@ -127,19 +127,19 @@ mod tests {
         let ab = Matrix::product(&a, &b);
         assert!(ab == expected, "Matrix product implemented incorrectly");
 
-        let a = Matrix::from_vector(vec![
+        let a = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
 
         ]);
 
-        let b = Matrix::from_vector(vec![
+        let b = Matrix::from_vector(&vec![
             vec![ 7.0,  8.0],
             vec![ 9.0, 10.0],
             vec![11.0, 12.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![ 58.0,  64.0],
             vec![139.0, 154.0]
 
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn matrix_operation_product_failure() {
-        let a = Matrix::from_vector(vec![
+        let a = Matrix::from_vector(&vec![
             vec![1.0, 0.0, 1.0],
             vec![2.0, 1.0, 1.0],
             vec![0.0, 1.0, 1.0],
@@ -163,7 +163,7 @@ mod tests {
 
         ]);
 
-        let b = Matrix::from_vector(vec![
+        let b = Matrix::from_vector(&vec![
             vec![1.0, 0.0, 1.0],
             vec![2.0, 1.0, 1.0],
             vec![0.0, 1.0, 1.0],
@@ -175,12 +175,12 @@ mod tests {
 
     #[test]
     fn matrix_operation_transposed() {
-        let a = Matrix::from_vector(vec![
+        let a = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![1.0, 4.0],
             vec![2.0, 5.0],
             vec![3.0, 6.0]

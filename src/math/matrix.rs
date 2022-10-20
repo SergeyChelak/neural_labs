@@ -2,16 +2,16 @@ use super::dimensions::Dimensions;
 
 pub struct Matrix {
     dimensions: Dimensions,
-    content: Vec<Vec<f64>>,
+    content: Vec<f64>,
 }
 
 impl Matrix {
     // initializers
     pub fn new<P>(rows: usize, cols: usize, mut producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
-        let mut content = vec![vec![0.0f64; cols]; rows];
+        let mut content = vec![0.0f64; rows * cols];
         for i in 0..rows {
             for j in 0..cols {
-                content[i][j] = producer(i, j);
+                content[i * cols + j] = producer(i, j);
             }
         }
         Matrix {
@@ -39,19 +39,16 @@ impl Matrix {
         )
     }
 
-    pub fn from_vector(vector: Vec<Vec<f64>>) -> Self {
+    pub fn from_vector(vector: &Vec<Vec<f64>>) -> Self {
         if let Ok(dims) = Dimensions::from_vector(&vector) {
-            return Matrix {
-                dimensions: dims,
-                content: vector 
-            }
+            return Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]);
         } else {
             panic!("Initializer vector must be rectangular")
         }
     }
 
     pub fn from_scalar(scalar: f64) -> Self {
-        Self::from_vector(vec![vec![scalar]])
+        Self::from_vector(&vec![vec![scalar]])
     }
 
     pub fn zero(rows: usize, cols: usize) -> Self {
@@ -72,11 +69,13 @@ impl Matrix {
     }
 
     pub fn get(&self, row: usize, col: usize) -> f64 {
-        self.content[row][col]
+        let pos = row * self.dimensions.cols() + col;
+        self.content[pos]
     }
 
     pub fn set(&mut self, row: usize, col: usize, value: f64) {
-        self.content[row][col] = value;
+        let pos = row * self.dimensions.cols() + col;
+        self.content[pos] = value;
     }
     
     pub fn is_same_size(&self, other: &Matrix) -> bool {
@@ -183,13 +182,12 @@ mod tests {
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0, 4.0]
         ];
-        let clone = v.clone();
-        let matrix = Matrix::from_vector(v);
+        let matrix = Matrix::from_vector(&v);
         assert_eq!(matrix.rows(), 2, "Incorrect rows count");
         assert_eq!(matrix.cols(), 3, "Incorrect cols count");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                assert_eq!(matrix.get(i, j), clone[i][j], "Value of matrix doesn't respond to original value");
+                assert_eq!(matrix.get(i, j), v[i][j], "Value of matrix doesn't respond to original value");
             }
         }
     }
@@ -201,6 +199,6 @@ mod tests {
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0]
         ];
-        _ = Matrix::from_vector(v);
+        _ = Matrix::from_vector(&v);
     }
 }
