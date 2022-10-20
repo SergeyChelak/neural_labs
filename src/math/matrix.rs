@@ -56,25 +56,21 @@ impl Matrix {
     }
 
     // properties and accessors
-    pub fn dimensions(&self) -> Dimensions {
-        self.dimensions
-    }
-
     pub fn rows(&self) -> usize {
-        self.dimensions.rows()
+        self.dimensions.rows
     }
 
     pub fn cols(&self) -> usize {
-        self.dimensions.cols()
+        self.dimensions.cols
     }
 
     pub fn get(&self, row: usize, col: usize) -> f64 {
-        let pos = row * self.dimensions.cols() + col;
+        let pos = row * self.dimensions.cols + col;
         self.content[pos]
     }
 
     pub fn set(&mut self, row: usize, col: usize, value: f64) {
-        let pos = row * self.dimensions.cols() + col;
+        let pos = row * self.dimensions.cols + col;
         self.content[pos] = value;
     }
     
