@@ -1,5 +1,6 @@
 use super::dimensions::Dimensions;
 
+#[derive(Clone)]
 pub struct Matrix {
     dimensions: Dimensions,
     content: Vec<f64>,
@@ -220,5 +221,16 @@ mod tests {
             }
         }
         Ok(())
+    }
+
+    #[test]
+    fn matrix_clone() {
+        let v = vec![
+            vec![1.0, 2.0, 3.0], 
+            vec![2.0, 3.0, 4.0]
+        ];
+        let m1 = Matrix::from_vector(&v);
+        let m2 = m1.clone();
+        assert_eq!(m1, m2, "Matrices should be equal after clone")
     }
 }
