@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, Debug)]
 pub struct Dimensions {
-    rows: usize,
-    cols: usize,
+    pub rows: usize,
+    pub cols: usize,
 }
 
 impl Dimensions {

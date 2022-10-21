@@ -45,19 +45,19 @@ mod tests {
 
     #[test]
     fn matrix_operation_add() {
-        let mut m1 = Matrix::from_vector(vec![
+        let mut m1 = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
         ]);
 
-        let m2 = Matrix::from_vector(vec![
+        let m2 = Matrix::from_vector(&vec![
             vec![9.0, 8.0, 7.0],
             vec![6.0, 5.0, 4.0],
             vec![3.0, 2.0, 1.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![10.0, 10.0, 10.0],
             vec![10.0, 10.0, 10.0],
             vec![10.0, 10.0, 10.0]
@@ -69,19 +69,19 @@ mod tests {
 
     #[test]
     fn matrix_operation_sub() {
-        let mut m1 = Matrix::from_vector(vec![
+        let mut m1 = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
         ]);
 
-        let m2 = Matrix::from_vector(vec![
+        let m2 = Matrix::from_vector(&vec![
             vec![9.0, 8.0, 7.0],
             vec![6.0, 5.0, 4.0],
             vec![3.0, 2.0, 1.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![-8.0, -6.0, -4.0],
             vec![-2.0,  0.0,  2.0],
             vec![ 4.0,  6.0,  8.0]
@@ -93,13 +93,13 @@ mod tests {
 
     #[test]
     fn matrix_operation_scalar_multiplication() {
-        let mut m = Matrix::from_vector(vec![
+        let mut m = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
         ]);
 
-        let expected = Matrix::from_vector(vec![
+        let expected = Matrix::from_vector(&vec![
             vec![ 2.0,  4.0,  6.0],
             vec![ 8.0, 10.0, 12.0],
             vec![14.0, 16.0, 18.0]
