@@ -68,14 +68,23 @@ impl Matrix {
         self.dimensions.cols
     }
 
-    pub fn get(&self, row: usize, col: usize) -> f64 {
-        let pos = row * self.dimensions.cols + col;
-        self.content[pos]
+    pub fn get(&self, row: usize, col: usize) -> MathResult<f64> {
+        if self.dimensions.is_valid_position(row, col) {
+            let pos = row * self.dimensions.cols + col;
+            Ok(self.content[pos])
+        } else {
+            Err(MathError::IncorrectPosition(row, col))
+        }
     }
 
-    pub fn set(&mut self, row: usize, col: usize, value: f64) {
-        let pos = row * self.dimensions.cols + col;
-        self.content[pos] = value;
+    pub fn set(&mut self, row: usize, col: usize, value: f64) -> MathResult<()> {
+        if self.dimensions.is_valid_position(row, col) {
+            let pos = row * self.dimensions.cols + col;
+            self.content[pos] = value;
+            Ok(())
+        } else {
+            Err(MathError::IncorrectPosition(row, col))
+        }
     }
     
     pub fn is_same_size(&self, other: &Matrix) -> bool {
@@ -116,7 +125,7 @@ mod tests {
         for i in 0..rows {
             for j in 0..cols {
                 let value = (i * rows + j) as f64;
-                assert_eq!(m.get(i, j), value, "Unexpected matrix value");
+                assert_eq!(m[i][j], value, "Unexpected matrix value");
             }
         }
     }
@@ -135,7 +144,7 @@ mod tests {
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
                 assert_eq!(
-                    matrix.get(i, j).to_bits(),
+                    matrix[i][j].to_bits(),
                     zero_bits,
                     "Zero matrix contains non-zero elements"
                 );
@@ -149,7 +158,7 @@ mod tests {
         assert_eq!(matrix.rows(), matrix.cols(), "Matrix isn't square");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                let value = matrix.get(i, j);
+                let value = matrix[i][j];
                 if i == j {
                     assert!(
                         f64::abs(value - 1.0) < f64::EPSILON,
@@ -182,7 +191,7 @@ mod tests {
         );
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                let value = matrix.get(i, j);
+                let value = matrix[i][j];
                 if i == j {
                     assert!(f64::abs(value - clone[i]) < f64::EPSILON, "Non-diagonal element is not equals to correspoing item of initializer vector");
                 } else {
@@ -206,7 +215,7 @@ mod tests {
         assert_eq!(matrix.cols(), 3, "Incorrect cols count");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                assert_eq!(matrix.get(i, j), v[i][j], "Value of matrix doesn't respond to original value");
+                assert_eq!(matrix[i][j], v[i][j], "Value of matrix doesn't correspond to original value");
             }
         }
         Ok(())
@@ -234,32 +243,30 @@ mod tests {
         // 
         for i in 0..dims.rows() {
             for j in 0..dims.cols() {
-                m.set(i, j, vector[i][j]);
+                m.set(i, j, vector[i][j])?;
             }
         }
         // 
         for i in 0..dims.rows() {
             for j in 0..dims.cols() {
-                assert_eq!(m.get(i, j), vector[i][j]);
+                assert_eq!(m[i][j], vector[i][j]);
             }
         }
         Ok(())
     }
 
     #[test]
-    fn matrix_clone() -> MathResult<()> {
-        let v = vec![
-            vec![1.0, 2.0, 3.0], 
-            vec![2.0, 3.0, 4.0]
-        ];
-        let m1 = Matrix::from_vector(&v)?;
-        let m2 = m1.clone();
-        assert_eq!(m1, m2, "Matrices should be equal after clone");
-        Ok(())
+    fn matrix_access_out_of_bounds() {
+        let m = Matrix::random(5, 8);
+        assert!(m.get(5, 0).is_err());
+        assert!(m.get(0, 8).is_err());
+        assert!(m.get(5, 8).is_err());
+        assert!(m.get(5, 9).is_err());
+        assert!(m.get(6, 9).is_err());
     }
 
     #[test]
-    fn matrix_access_index_trait() {
+    fn matrix_access_index_trait() -> MathResult<()> {
         let sizes: [(usize, usize); 6] = [
             (0, 0),
             (1, 0),
@@ -272,14 +279,15 @@ mod tests {
             let m = Matrix::random(rows, cols);
             for i in 0..m.rows() {
                 for j in 0..m.cols() {                
-                    assert_eq!(m[i][j], m.get(i, j), "Incorrect value via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
+                    assert_eq!(m[i][j], m.get(i, j)?, "Incorrect value via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
                 }
             }
         }   
+        Ok(())
     }
 
     #[test]
-    fn matrix_access_indexmut_trait() -> MathResult<()> {
+    fn matrix_access_index_mut_trait() -> MathResult<()> {
         let vector = vec![
             vec![1.2, 2.3, 3.4, 6.1],
             vec![4.5, 5.6, 6.7, 5.2],
@@ -296,10 +304,22 @@ mod tests {
 
         for i in 0..m.rows() {
             for j in 0..m.cols() {
-                assert_eq!(m.get(i, j), vector[i][j], "Value at {}:{} written incorrectly", i, j);
+                assert_eq!(m.get(i, j)?, vector[i][j], "Value at {}:{} was written incorrectly", i, j);
             }
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_clone() -> MathResult<()> {
+        let v = vec![
+            vec![1.0, 2.0, 3.0], 
+            vec![2.0, 3.0, 4.0]
+        ];
+        let m1 = Matrix::from_vector(&v)?;
+        let m2 = m1.clone();
+        assert_eq!(m1, m2, "Matrices should be equal after clone");
         Ok(())
     }
 }

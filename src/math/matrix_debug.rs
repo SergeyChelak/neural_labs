@@ -6,7 +6,7 @@ impl fmt::Debug for Matrix {
         writeln!(f, "Matrix [{}x{}]", self.rows(), self.cols())?;
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                write!(f, "{:8.3}", self.get(i, j))?;
+                write!(f, "{:8.3}", self[i][j])?;
             }
             writeln!(f)?;
         }

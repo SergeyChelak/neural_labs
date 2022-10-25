@@ -17,7 +17,7 @@ impl Matrix {
         }
         let (rows, cols) = (first.rows(), first.cols());
         Ok(Matrix::new(rows, cols, |i: usize, j: usize| {
-            operation(first.get(i, j), second.get(i, j))
+            operation(first[i][j], second[i][j])
         }))
     }
 
@@ -32,9 +32,9 @@ impl Matrix {
             for j in 0..cols {
                 let mut sum = 0.0f64;
                 for k in 0..fc {
-                    sum += first.get(i, k) * second.get(k, j);
+                    sum += first[i][k] * second[k][j];
                 }
-                matrix.set(i, j, sum);
+                matrix[i][j] = sum;
             }
         }
         Ok(matrix)
@@ -43,7 +43,7 @@ impl Matrix {
     pub fn transposed(&self) -> Matrix {
         let (rows, cols) = (self.rows(), self.cols());
         Matrix::new(cols, rows, |i, j| {
-            self.get(j, i)
+            self[j][i]
         })
     }
 

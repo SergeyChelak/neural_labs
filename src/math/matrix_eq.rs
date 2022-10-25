@@ -7,7 +7,7 @@ impl PartialEq for Matrix {
             let cols = self.cols();
             for i in 0..rows {
                 for j in 0..cols {
-                    if f64::abs(self.get(i, j) - other.get(i, j)) > f64::EPSILON {
+                    if f64::abs(self[i][j] - other[i][j]) > f64::EPSILON {
                         return false;
                     }
                 }
