@@ -5,7 +5,7 @@ impl Matrix {
     pub fn map_mut<Func>(&mut self, f: Func) -> &mut Matrix where Func: Fn(usize, usize, f64) -> f64 {
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                let value = f(i, j, self.get(i, j).unwrap());
+                let value = f(i, j, self.get_unchecked(i, j));
                 _ = self.set(i, j, value);
             }
         }

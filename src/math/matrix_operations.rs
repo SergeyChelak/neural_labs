@@ -17,7 +17,7 @@ impl Matrix {
         }
         let (rows, cols) = (first.rows(), first.cols());
         Ok(Matrix::new(rows, cols, |i: usize, j: usize| {
-            operation(first.get(i, j).unwrap(), second.get(i, j).unwrap())
+            operation(first.get_unchecked(i, j), second.get_unchecked(i, j))
         }))
     }
 
@@ -32,7 +32,7 @@ impl Matrix {
             for j in 0..cols {
                 let mut sum = 0.0f64;
                 for k in 0..fc {
-                    sum += first.get(i, k).unwrap() * second.get(k, j).unwrap();
+                    sum += first.get_unchecked(i, k) * second.get_unchecked(k, j);
                 }
                 matrix[i][j] = sum;
             }
@@ -43,7 +43,7 @@ impl Matrix {
     pub fn transposed(&self) -> Matrix {
         let (rows, cols) = (self.rows(), self.cols());
         Matrix::new(cols, rows, |i, j| {
-            self.get(j, i).unwrap()
+            self.get_unchecked(j, i)
         })
     }
 

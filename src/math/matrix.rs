@@ -70,25 +70,38 @@ impl Matrix {
 
     pub fn get(&self, row: usize, col: usize) -> MathResult<f64> {
         if self.dimensions.is_valid_position(row, col) {
-            let pos = row * self.dimensions.cols + col;
-            Ok(self.content[pos])
+            Ok(self.get_unchecked(row, col))
         } else {
             Err(MathError::IncorrectPosition(row, col))
         }
     }
 
+    pub fn get_unchecked(&self, row: usize, col: usize) -> f64 {        
+        let pos = self.position(row, col);
+        self.content[pos]
+    }
+
     pub fn set(&mut self, row: usize, col: usize, value: f64) -> MathResult<()> {
         if self.dimensions.is_valid_position(row, col) {
-            let pos = row * self.dimensions.cols + col;
-            self.content[pos] = value;
+            self.set_unchecked(row, col, value);
             Ok(())
         } else {
             Err(MathError::IncorrectPosition(row, col))
         }
     }
+
+    pub fn set_unchecked(&mut self, row: usize, col: usize, value: f64) {
+        let pos = self.position(row, col);
+        self.content[pos] = value;
+    }
     
     pub fn is_same_size(&self, other: &Matrix) -> bool {
         self.dimensions == other.dimensions
+    }
+
+    #[inline(always)]
+    fn position(&self, row: usize, col: usize) -> usize {
+        row * self.dimensions.cols + col
     }
 }
 
