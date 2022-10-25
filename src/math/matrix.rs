@@ -93,6 +93,14 @@ impl std::ops::Index<usize> for Matrix {
     }
 }
 
+impl std::ops::IndexMut<usize> for Matrix {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let cols = self.cols();
+        let pos = index * cols;
+        self.content[pos..pos + cols].as_mut()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::math::errors::MathError;
@@ -215,7 +223,7 @@ mod tests {
     }
 
     #[test]
-    fn matrix_get_set() -> Result<(), MathError> {
+    fn matrix_access_get_set() -> Result<(), MathError> {
         let vector = vec![
             vec![1.2, 2.3, 3.4, 6.1],
             vec![4.5, 5.6, 6.7, 5.2],
@@ -251,7 +259,7 @@ mod tests {
     }
 
     #[test]
-    fn matrix_index_trait() {
+    fn matrix_access_index_trait() {
         let sizes: [(usize, usize); 6] = [
             (0, 0),
             (1, 0),
@@ -260,14 +268,38 @@ mod tests {
             (5, 1),
             (7, 11)
         ];
-
         for (rows, cols) in sizes {
-        let m = Matrix::random(rows, cols);
+            let m = Matrix::random(rows, cols);
+            for i in 0..m.rows() {
+                for j in 0..m.cols() {                
+                    assert_eq!(m[i][j], m.get(i, j), "Incorrect value via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
+                }
+            }
+        }   
+    }
+
+    #[test]
+    fn matrix_access_indexmut_trait() -> MathResult<()> {
+        let vector = vec![
+            vec![1.2, 2.3, 3.4, 6.1],
+            vec![4.5, 5.6, 6.7, 5.2],
+            vec![7.8, 8.9, 9.0, 4.3],
+        ];
+        let dims = Dimensions::from_vector(&vector)?;
+        let mut m = Matrix::zero(dims.rows(), dims.cols());
+
         for i in 0..m.rows() {
-            for j in 0..m.cols() {                
-                assert_eq!(m[i][j], m.get(i, j), "Incorrect access via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
+            for j in 0..m.cols() {
+                m[i][j] = vector[i][j];
             }
         }
-    }
+
+        for i in 0..m.rows() {
+            for j in 0..m.cols() {
+                assert_eq!(m.get(i, j), vector[i][j], "Value at {}:{} written incorrectly", i, j);
+            }
+        }
+
+        Ok(())
     }
 }
