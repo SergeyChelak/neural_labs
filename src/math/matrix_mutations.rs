@@ -6,7 +6,7 @@ impl Matrix {
         for i in 0..self.rows() {
             for j in 0..self.cols() {
                 let value = f(i, j, self.get_unchecked(i, j));
-                _ = self.set(i, j, value);
+                self.set_unchecked(i, j, value);
             }
         }
         self

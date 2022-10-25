@@ -34,7 +34,7 @@ impl Matrix {
                 for k in 0..fc {
                     sum += first.get_unchecked(i, k) * second.get_unchecked(k, j);
                 }
-                matrix[i][j] = sum;
+                matrix.set_unchecked(i, j, sum);
             }
         }
         Ok(matrix)
