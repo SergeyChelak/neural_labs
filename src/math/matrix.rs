@@ -1,3 +1,5 @@
+use std::vec;
+
 use super::dimensions::Dimensions;
 use super::errors::*;
 
@@ -79,7 +81,16 @@ impl Matrix {
     pub fn is_same_size(&self, other: &Matrix) -> bool {
         self.dimensions == other.dimensions
     }
-    
+}
+
+impl std::ops::Index<usize> for Matrix {
+    type Output = [f64];
+
+    fn index(&self, index: usize) -> &Self::Output {
+        let cols = self.cols();
+        let pos = index * cols;
+        &self.content[pos..pos + cols]
+    }
 }
 
 #[cfg(test)]
@@ -237,5 +248,26 @@ mod tests {
         let m2 = m1.clone();
         assert_eq!(m1, m2, "Matrices should be equal after clone");
         Ok(())
+    }
+
+    #[test]
+    fn matrix_index_trait() {
+        let sizes: [(usize, usize); 6] = [
+            (0, 0),
+            (1, 0),
+            (1, 1),
+            (1, 5),
+            (5, 1),
+            (7, 11)
+        ];
+
+        for (rows, cols) in sizes {
+        let m = Matrix::random(rows, cols);
+        for i in 0..m.rows() {
+            for j in 0..m.cols() {                
+                assert_eq!(m[i][j], m.get(i, j), "Incorrect access via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
+            }
+        }
+    }
     }
 }
