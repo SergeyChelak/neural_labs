@@ -1,4 +1,5 @@
 use super::dimensions::Dimensions;
+use super::errors::*;
 
 #[derive(Clone)]
 pub struct Matrix {
@@ -40,15 +41,12 @@ impl Matrix {
         )
     }
 
-    pub fn from_vector(vector: &Vec<Vec<f64>>) -> Self {
-        if let Ok(dims) = Dimensions::from_vector(&vector) {
-            return Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]);
-        } else {
-            panic!("Initializer vector must be rectangular")
-        }
+    pub fn from_vector(vector: &Vec<Vec<f64>>) -> MathResult<Self> {
+        let dims = Dimensions::from_vector(vector)?;
+        Ok(Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]))
     }
 
-    pub fn from_scalar(scalar: f64) -> Self {
+    pub fn from_scalar(scalar: f64) -> MathResult<Self> {
         Self::from_vector(&vec![vec![scalar]])
     }
 
@@ -57,6 +55,9 @@ impl Matrix {
     }
 
     // properties and accessors
+    pub fn dimensions(&self) -> Dimensions {
+        self.dimensions
+    }
     pub fn rows(&self) -> usize {
         self.dimensions.rows
     }
@@ -83,6 +84,8 @@ impl Matrix {
 
 #[cfg(test)]
 mod tests {
+    use crate::math::errors::MathError;
+
     use super::*;
 
     #[test]
@@ -174,12 +177,12 @@ mod tests {
     }
 
     #[test]
-    fn matrix_init_from_vector() {
+    fn matrix_init_from_vector() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0, 4.0]
         ];
-        let matrix = Matrix::from_vector(&v);
+        let matrix = Matrix::from_vector(&v)?;
         assert_eq!(matrix.rows(), 2, "Incorrect rows count");
         assert_eq!(matrix.cols(), 3, "Incorrect cols count");
         for i in 0..matrix.rows() {
@@ -187,20 +190,21 @@ mod tests {
                 assert_eq!(matrix.get(i, j), v[i][j], "Value of matrix doesn't respond to original value");
             }
         }
+        Ok(())
     }
 
     #[test]
-    #[should_panic]
-    fn matrix_init_from_incorrect_vector() {
+    fn matrix_init_from_incorrect_vector() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0]
         ];
-        _ = Matrix::from_vector(&v);
+        assert_eq!(Matrix::from_vector(&v), Err(MathError::IncorrectVectorDimensions));
+        Ok(())
     }
 
     #[test]
-    fn matrix_get_set() -> Result<(), ()> {
+    fn matrix_get_set() -> Result<(), MathError> {
         let vector = vec![
             vec![1.2, 2.3, 3.4, 6.1],
             vec![4.5, 5.6, 6.7, 5.2],
@@ -224,13 +228,14 @@ mod tests {
     }
 
     #[test]
-    fn matrix_clone() {
+    fn matrix_clone() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0, 4.0]
         ];
-        let m1 = Matrix::from_vector(&v);
+        let m1 = Matrix::from_vector(&v)?;
         let m2 = m1.clone();
-        assert_eq!(m1, m2, "Matrices should be equal after clone")
+        assert_eq!(m1, m2, "Matrices should be equal after clone");
+        Ok(())
     }
 }
