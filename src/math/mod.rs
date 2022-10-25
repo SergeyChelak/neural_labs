@@ -1,5 +1,6 @@
 // Linear algebra and math functions module
 
+pub mod errors;
 pub mod dimensions;
 pub mod matrix;
 pub mod matrix_debug;

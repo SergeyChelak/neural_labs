@@ -1,3 +1,5 @@
+use super::errors::*;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Dimensions {
     pub rows: usize,
@@ -13,7 +15,7 @@ impl Dimensions {
         Self::new(dim, dim)
     }
 
-    pub fn from_vector<T>(vec: &Vec<Vec<T>>) -> Result<Self, ()> {
+    pub fn from_vector<T>(vec: &Vec<Vec<T>>) -> MathResult<Self> {
         let rows = vec.len();
         if rows == 0 {
             return Ok(Self::new(0, 0));
@@ -21,7 +23,7 @@ impl Dimensions {
         let cols = vec[0].len();
         for i in 1..rows {
             if vec[i].len() != cols {
-                return Err(());
+                return Err(MathError::IncorrectVectorDimensions);
             }
         }
         Ok(Self::new(rows, cols))
@@ -67,7 +69,7 @@ mod tests {
         assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(0, 0)));
 
         let v = vec![vec![1, 2, 3], vec![2, 3]];
-        assert_eq!(Dimensions::from_vector(&v), Err(()));
+        assert_eq!(Dimensions::from_vector(&v), Err(MathError::IncorrectVectorDimensions));
 
         let v: Vec<Vec<()>> = vec![vec![()]];
         assert_eq!(Dimensions::from_vector(&v), Ok(Dimensions::new(1, 1)));

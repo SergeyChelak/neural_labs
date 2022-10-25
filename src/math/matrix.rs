@@ -1,4 +1,7 @@
+use std::vec;
+
 use super::dimensions::Dimensions;
+use super::errors::*;
 
 #[derive(Clone)]
 pub struct Matrix {
@@ -40,15 +43,12 @@ impl Matrix {
         )
     }
 
-    pub fn from_vector(vector: &Vec<Vec<f64>>) -> Self {
-        if let Ok(dims) = Dimensions::from_vector(&vector) {
-            return Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]);
-        } else {
-            panic!("Initializer vector must be rectangular")
-        }
+    pub fn from_vector(vector: &Vec<Vec<f64>>) -> MathResult<Self> {
+        let dims = Dimensions::from_vector(vector)?;
+        Ok(Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]))
     }
 
-    pub fn from_scalar(scalar: f64) -> Self {
+    pub fn from_scalar(scalar: f64) -> MathResult<Self> {
         Self::from_vector(&vec![vec![scalar]])
     }
 
@@ -57,6 +57,9 @@ impl Matrix {
     }
 
     // properties and accessors
+    pub fn dimensions(&self) -> Dimensions {
+        self.dimensions
+    }
     pub fn rows(&self) -> usize {
         self.dimensions.rows
     }
@@ -65,24 +68,52 @@ impl Matrix {
         self.dimensions.cols
     }
 
-    pub fn get(&self, row: usize, col: usize) -> f64 {
-        let pos = row * self.dimensions.cols + col;
-        self.content[pos]
+    pub fn get(&self, row: usize, col: usize) -> MathResult<f64> {
+        if self.dimensions.is_valid_position(row, col) {
+            let pos = row * self.dimensions.cols + col;
+            Ok(self.content[pos])
+        } else {
+            Err(MathError::IncorrectPosition(row, col))
+        }
     }
 
-    pub fn set(&mut self, row: usize, col: usize, value: f64) {
-        let pos = row * self.dimensions.cols + col;
-        self.content[pos] = value;
+    pub fn set(&mut self, row: usize, col: usize, value: f64) -> MathResult<()> {
+        if self.dimensions.is_valid_position(row, col) {
+            let pos = row * self.dimensions.cols + col;
+            self.content[pos] = value;
+            Ok(())
+        } else {
+            Err(MathError::IncorrectPosition(row, col))
+        }
     }
     
     pub fn is_same_size(&self, other: &Matrix) -> bool {
         self.dimensions == other.dimensions
     }
-    
+}
+
+impl std::ops::Index<usize> for Matrix {
+    type Output = [f64];
+
+    fn index(&self, index: usize) -> &Self::Output {
+        let cols = self.cols();
+        let pos = index * cols;
+        &self.content[pos..pos + cols]
+    }
+}
+
+impl std::ops::IndexMut<usize> for Matrix {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let cols = self.cols();
+        let pos = index * cols;
+        self.content[pos..pos + cols].as_mut()
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::math::errors::MathError;
+
     use super::*;
 
     #[test]
@@ -94,7 +125,7 @@ mod tests {
         for i in 0..rows {
             for j in 0..cols {
                 let value = (i * rows + j) as f64;
-                assert_eq!(m.get(i, j), value, "Unexpected matrix value");
+                assert_eq!(m[i][j], value, "Unexpected matrix value");
             }
         }
     }
@@ -113,7 +144,7 @@ mod tests {
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
                 assert_eq!(
-                    matrix.get(i, j).to_bits(),
+                    matrix[i][j].to_bits(),
                     zero_bits,
                     "Zero matrix contains non-zero elements"
                 );
@@ -127,7 +158,7 @@ mod tests {
         assert_eq!(matrix.rows(), matrix.cols(), "Matrix isn't square");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                let value = matrix.get(i, j);
+                let value = matrix[i][j];
                 if i == j {
                     assert!(
                         f64::abs(value - 1.0) < f64::EPSILON,
@@ -160,7 +191,7 @@ mod tests {
         );
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                let value = matrix.get(i, j);
+                let value = matrix[i][j];
                 if i == j {
                     assert!(f64::abs(value - clone[i]) < f64::EPSILON, "Non-diagonal element is not equals to correspoing item of initializer vector");
                 } else {
@@ -174,33 +205,34 @@ mod tests {
     }
 
     #[test]
-    fn matrix_init_from_vector() {
+    fn matrix_init_from_vector() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0, 4.0]
         ];
-        let matrix = Matrix::from_vector(&v);
+        let matrix = Matrix::from_vector(&v)?;
         assert_eq!(matrix.rows(), 2, "Incorrect rows count");
         assert_eq!(matrix.cols(), 3, "Incorrect cols count");
         for i in 0..matrix.rows() {
             for j in 0..matrix.cols() {
-                assert_eq!(matrix.get(i, j), v[i][j], "Value of matrix doesn't respond to original value");
+                assert_eq!(matrix[i][j], v[i][j], "Value of matrix doesn't correspond to original value");
             }
         }
+        Ok(())
     }
 
     #[test]
-    #[should_panic]
-    fn matrix_init_from_incorrect_vector() {
+    fn matrix_init_from_incorrect_vector() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0]
         ];
-        _ = Matrix::from_vector(&v);
+        assert_eq!(Matrix::from_vector(&v), Err(MathError::IncorrectVectorDimensions));
+        Ok(())
     }
 
     #[test]
-    fn matrix_get_set() -> Result<(), ()> {
+    fn matrix_access_get_set() -> Result<(), MathError> {
         let vector = vec![
             vec![1.2, 2.3, 3.4, 6.1],
             vec![4.5, 5.6, 6.7, 5.2],
@@ -211,26 +243,83 @@ mod tests {
         // 
         for i in 0..dims.rows() {
             for j in 0..dims.cols() {
-                m.set(i, j, vector[i][j]);
+                m.set(i, j, vector[i][j])?;
             }
         }
         // 
         for i in 0..dims.rows() {
             for j in 0..dims.cols() {
-                assert_eq!(m.get(i, j), vector[i][j]);
+                assert_eq!(m[i][j], vector[i][j]);
             }
         }
         Ok(())
     }
 
     #[test]
-    fn matrix_clone() {
+    fn matrix_access_out_of_bounds() {
+        let m = Matrix::random(5, 8);
+        assert!(m.get(5, 0).is_err());
+        assert!(m.get(0, 8).is_err());
+        assert!(m.get(5, 8).is_err());
+        assert!(m.get(5, 9).is_err());
+        assert!(m.get(6, 9).is_err());
+    }
+
+    #[test]
+    fn matrix_access_index_trait() -> MathResult<()> {
+        let sizes: [(usize, usize); 6] = [
+            (0, 0),
+            (1, 0),
+            (1, 1),
+            (1, 5),
+            (5, 1),
+            (7, 11)
+        ];
+        for (rows, cols) in sizes {
+            let m = Matrix::random(rows, cols);
+            for i in 0..m.rows() {
+                for j in 0..m.cols() {                
+                    assert_eq!(m[i][j], m.get(i, j)?, "Incorrect value via indexing at {}:{} for dim {:?}", i, j, m.dimensions);
+                }
+            }
+        }   
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_access_index_mut_trait() -> MathResult<()> {
+        let vector = vec![
+            vec![1.2, 2.3, 3.4, 6.1],
+            vec![4.5, 5.6, 6.7, 5.2],
+            vec![7.8, 8.9, 9.0, 4.3],
+        ];
+        let dims = Dimensions::from_vector(&vector)?;
+        let mut m = Matrix::zero(dims.rows(), dims.cols());
+
+        for i in 0..m.rows() {
+            for j in 0..m.cols() {
+                m[i][j] = vector[i][j];
+            }
+        }
+
+        for i in 0..m.rows() {
+            for j in 0..m.cols() {
+                assert_eq!(m.get(i, j)?, vector[i][j], "Value at {}:{} was written incorrectly", i, j);
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_clone() -> MathResult<()> {
         let v = vec![
             vec![1.0, 2.0, 3.0], 
             vec![2.0, 3.0, 4.0]
         ];
-        let m1 = Matrix::from_vector(&v);
+        let m1 = Matrix::from_vector(&v)?;
         let m2 = m1.clone();
-        assert_eq!(m1, m2, "Matrices should be equal after clone")
+        assert_eq!(m1, m2, "Matrices should be equal after clone");
+        Ok(())
     }
 }

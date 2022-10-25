@@ -17,7 +17,7 @@ mod tests {
         let m = Matrix::random(50, 80);
         for i in 0..m.rows() {
             for j in 0..m.cols() {
-                let v = m.get(i, j);
+                let v = m[i][j];
                 assert!(v >= 0.0 && v < 1.0, "Incorrect initial random value")
             }
         }
