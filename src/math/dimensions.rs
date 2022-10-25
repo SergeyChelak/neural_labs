@@ -29,18 +29,22 @@ impl Dimensions {
         Ok(Self::new(rows, cols))
     }
 
+    #[inline(always)]
     pub fn is_valid_position(&self, row: usize, col: usize) -> bool {
         row < self.rows && col < self.cols
     }
 
+    #[inline(always)]
     pub fn is_square(&self) -> bool {
         self.rows == self.cols
     }
 
+    #[inline(always)]
     pub fn rows(&self) -> usize {
         self.rows
     }
 
+    #[inline(always)]
     pub fn cols(&self) -> usize {
         self.cols
     }

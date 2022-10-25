@@ -57,13 +57,17 @@ impl Matrix {
     }
 
     // properties and accessors
+    #[inline(always)]
     pub fn dimensions(&self) -> Dimensions {
         self.dimensions
     }
+
+    #[inline(always)]
     pub fn rows(&self) -> usize {
         self.dimensions.rows
     }
 
+    #[inline(always)]
     pub fn cols(&self) -> usize {
         self.dimensions.cols
     }
@@ -76,6 +80,7 @@ impl Matrix {
         }
     }
 
+    #[inline(always)]
     pub fn get_unchecked(&self, row: usize, col: usize) -> f64 {        
         let pos = self.position(row, col);
         self.content[pos]
@@ -90,11 +95,13 @@ impl Matrix {
         }
     }
 
+    #[inline(always)]
     pub fn set_unchecked(&mut self, row: usize, col: usize, value: f64) {
         let pos = self.position(row, col);
         self.content[pos] = value;
     }
     
+    #[inline(always)]
     pub fn is_same_size(&self, other: &Matrix) -> bool {
         self.dimensions == other.dimensions
     }
