@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::vec;
 
 use super::dimensions::Dimensions;
@@ -145,6 +146,10 @@ impl Matrix {
             self.content[i] = operation(self.content[i]);
         }
         self 
+    }
+
+    pub fn mean(&self) -> f64 {
+        self.content.iter().fold(0.0, |acc, v| acc + v) / self.content.len() as f64
     }
 }
 
@@ -376,6 +381,17 @@ mod tests {
         let m1 = Matrix::from_vector(&v)?;
         let m2 = m1.clone();
         assert_eq!(m1, m2, "Matrices should be equal after clone");
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_mean() -> MathResult<()> {
+        let m = Matrix::from_vector(&vec![
+            vec![1.0, 2.0],
+            vec![3.0, 4.0],
+        ])?;
+        let mean = m.mean();
+        assert!(f64::abs(mean - 2.5) < f64::EPSILON, "Matrix mean implemented incorrectly. Value {}", mean);
         Ok(())
     }
 }
