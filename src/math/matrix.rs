@@ -110,6 +110,42 @@ impl Matrix {
     fn position(&self, row: usize, col: usize) -> usize {
         row * self.dimensions.cols + col
     }
+
+    pub fn element_wise<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
+        if a.is_same_size(&b) {
+            let size = a.content.len();
+            let mut vector = vec![0.0; size];
+            for i in 0..size {
+                vector[i] = operation(a.content[i], b.content[i]);
+            }
+            Ok(
+                Matrix { 
+                    dimensions: a.dimensions, 
+                    content: vector 
+                }
+            )
+        } else {
+            Err(MathError::IncorrectMatricesDimensions("element wise".to_string(), a.dimensions, b.dimensions))
+        }
+    }
+
+    pub fn element_wise_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<&mut Self> {
+        if self.is_same_size(other) {
+            for i in 0..self.content.len() {
+                self.content[i] = operation(self.content[i], other.content[i]);
+            }
+            Ok(self)
+        } else {
+            Err(MathError::IncorrectMatricesDimensions("element wise mut".to_string(), self.dimensions, other.dimensions))
+        }        
+    }
+
+    pub fn element_wise_mut<Op: Fn(f64) -> f64>(&mut self, operation: Op) -> &mut Self {
+        for i in 0..self.content.len() {
+            self.content[i] = operation(self.content[i]);
+        }
+        self 
+    }
 }
 
 impl std::ops::Index<usize> for Matrix {
