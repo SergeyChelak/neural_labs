@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use std::vec;
 
 use super::dimensions::Dimensions;
