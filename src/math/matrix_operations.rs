@@ -60,6 +60,12 @@ impl Matrix {
     pub fn divide_assign(&mut self, scalar: f64) -> &mut Self {
         self.element_wise_mut(|x| x / scalar)
     }
+
+    pub fn powi(matrix: &Matrix, power: i32) -> Self {
+        Self::new(matrix.rows(), matrix.cols(), |i, j| {
+            f64::powi(matrix.get_unchecked(i, j), power)
+        })
+    }
 }
 
 #[cfg(test)]
@@ -291,6 +297,24 @@ mod tests {
         ])?;
 
         assert!(m.divide_assign(2.0) == &expected, "Matrix divide by scalar implemented incorrectly");
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_operation_power_integer() -> MathResult<()> {
+        let m = Matrix::from_vector(&vec![
+            vec![1.0, 2.0, 3.0],
+            vec![4.0, 5.0, 6.0],
+            vec![7.0, 8.0, 9.0]
+        ])?;
+
+        let expected = Matrix::from_vector(&vec![
+            vec![ 1.0,  4.0,  9.0],
+            vec![16.0, 25.0, 36.0],
+            vec![49.0, 64.0, 81.0]
+        ])?;
+
+        assert!(Matrix::powi(&m, 2) == expected, "Matrix divide by scalar implemented incorrectly");
         Ok(())
     }
 
