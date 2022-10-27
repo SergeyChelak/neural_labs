@@ -4,40 +4,31 @@ use super::errors::*;
 impl Matrix {
 
     pub fn add(first: &Matrix, second: &Matrix) -> MathResult<Self> {
-        Self::map(first, second, "add", |x, y| x + y)        
+        Self::element_wise(first, second, |x, y| x + y)
     }
 
     pub fn sub(first: &Matrix, second: &Matrix) -> MathResult<Self> {
-        Self::map(first, second, "subtract",|x, y| x - y)        
-    }
-
-    fn map<Operation>(first: &Matrix, second: &Matrix, op_name: &str, operation: Operation) -> MathResult<Self> where Operation : Fn(f64, f64) -> f64 {
-        if !first.is_same_size(&second) {
-            return Err(MathError::IncorrectMatricesDimensions(op_name.to_string(), first.dimensions(), second.dimensions()));
-        }
-        let (rows, cols) = (first.rows(), first.cols());
-        Ok(Matrix::new(rows, cols, |i: usize, j: usize| {
-            operation(first.get_unchecked(i, j), second.get_unchecked(i, j))
-        }))
+        Self::element_wise(first, second, |x, y| x - y)
     }
 
     pub fn product(first: &Matrix, second: &Matrix) -> MathResult<Self> {
         let (rows, fc) = (first.rows(), first.cols());
         let (sr, cols) = (second.rows(), second.cols());
-        if fc != sr {
-            return Err(MathError::IncorrectMatricesDimensions("product".to_string(), first.dimensions(), second.dimensions()));
-        }
-        let mut matrix = Matrix::zero(rows, cols);
-        for i in 0..rows {            
-            for j in 0..cols {
-                let mut sum = 0.0f64;
-                for k in 0..fc {
-                    sum += first.get_unchecked(i, k) * second.get_unchecked(k, j);
+        if fc == sr {
+            let mut matrix = Matrix::zero(rows, cols);
+            for i in 0..rows {            
+                for j in 0..cols {
+                    let mut sum = 0.0f64;
+                    for k in 0..fc {
+                        sum += first.get_unchecked(i, k) * second.get_unchecked(k, j);
+                    }
+                    matrix.set_unchecked(i, j, sum);
                 }
-                matrix.set_unchecked(i, j, sum);
             }
-        }
-        Ok(matrix)
+            Ok(matrix)
+        } else {
+            Err(MathError::IncorrectMatricesDimensions("product".to_string(), first.dimensions(), second.dimensions()))
+        }        
     }
 
     pub fn transposed(&self) -> Matrix {
@@ -74,7 +65,7 @@ mod tests {
         ])?;
 
         let sum = Matrix::add(&m1, &m2)?;
-        assert!(sum == expected, "Matrix sum implemeted incorrectly");
+        assert!(sum == expected, "Matrix sum implemented incorrectly");
         Ok(())
     }
 
@@ -99,7 +90,7 @@ mod tests {
         ])?;
 
         let sum = Matrix::sub(&m1, &m2)?;
-        assert!(sum == expected, "Matrix subtraction implemeted incorrectly");
+        assert!(sum == expected, "Matrix subtraction implemented incorrectly");
         Ok(())
     }
 

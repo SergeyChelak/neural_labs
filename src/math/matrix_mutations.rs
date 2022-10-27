@@ -2,47 +2,22 @@ use super::matrix::Matrix;
 use super::errors::*;
 
 impl Matrix {
-    pub fn map_mut<Func>(&mut self, f: Func) -> &mut Matrix where Func: Fn(usize, usize, f64) -> f64 {
-        for i in 0..self.rows() {
-            for j in 0..self.cols() {
-                let value = f(i, j, self.get_unchecked(i, j));
-                self.set_unchecked(i, j, value);
-            }
-        }
-        self
+    pub fn add_mut(&mut self, other: &Matrix) -> MathResult<&mut Self> {
+        self.element_wise_other(other, |a, b| a + b)        
     }
 
-    pub fn add_mut(&mut self, other: &Matrix) -> MathResult<&mut Matrix> {
-        if !self.is_same_size(&other) {
-            return Err(MathError::IncorrectMatricesDimensions("sum".to_string(), self.dimensions(), other.dimensions()));
-        }
-        Ok(self.map_mut(|i, j, value| {
-            value + other[i][j]
-        }))
+    pub fn sub_mut(&mut self, other: &Matrix) -> MathResult<&mut Self> {
+        self.element_wise_other(other, |a, b| a - b)
     }
 
-    pub fn sub_mut(&mut self, other: &Matrix) -> MathResult<&mut Matrix> {
-        if !self.is_same_size(&other) {
-            return Err(MathError::IncorrectMatricesDimensions("subtract".to_string(), self.dimensions(), other.dimensions()));
-        }
-        Ok(self.map_mut(|i, j, value| {
-            value - other[i][j]
-        }))
-    }
-
-    pub fn mul_mut(&mut self, scalar: f64) -> &mut Matrix {
-        self.map_mut(|_, _, v| v * scalar)
+    pub fn mul_mut(&mut self, scalar: f64) -> &mut Self {
+        self.element_wise_mut(|x| x * scalar)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn matrix_mutations_map() {
-        // verified with add or sub tests
-    }
 
     #[test]
     fn matrix_operation_add() -> MathResult<()> {
