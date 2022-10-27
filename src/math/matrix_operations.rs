@@ -74,7 +74,7 @@ mod tests {
         ])?;
 
         let sum = Matrix::add(&m1, &m2)?;
-        assert!(sum == expected, "Matrix sum implemeted incorrectly");
+        assert!(sum == expected, "Matrix sum implemented incorrectly");
         Ok(())
     }
 
@@ -99,7 +99,7 @@ mod tests {
         ])?;
 
         let sum = Matrix::sub(&m1, &m2)?;
-        assert!(sum == expected, "Matrix subtraction implemeted incorrectly");
+        assert!(sum == expected, "Matrix subtraction implemented incorrectly");
         Ok(())
     }
 
