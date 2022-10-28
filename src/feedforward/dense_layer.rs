@@ -1,9 +1,10 @@
-use crate::math::matrix::*;
+use crate::math::{errors::MathResult, matrix::*};
 use super::layer::*;
 
 struct Dense {
     weight: Matrix,
     bias: Matrix,
+    input: Matrix
 }
 
 impl Dense {
@@ -13,17 +14,27 @@ impl Dense {
         Self {
             weight,
             bias,
+            input: Matrix::zero(0, 0)
         }
     } 
 }
 
 impl Layer for Dense {
-    fn forward(&self, input: &Matrix) -> Matrix {
-        // self.input = input ???
-        Matrix::product(&self.weight, input).unwrap()
+    fn forward(&mut self, input: Matrix) -> MathResult<Matrix> {
+        self.input = input;
+        Matrix::product(&self.weight, &self.input)
     }
 
-    fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) {
-        todo!()
+    fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
+        let weight_gradient = Matrix::product(output_gradient, &self.input.transpose())?;
+        _ = self.weight.minus_assign(
+            &Matrix::mul_scalar(&weight_gradient, learning_rate)
+        );
+
+        _ = self.bias.minus_assign(
+            &Matrix::mul_scalar(&output_gradient, learning_rate)
+        );
+
+        Matrix::product(&self.weight.transpose(), output_gradient)
     }
 }

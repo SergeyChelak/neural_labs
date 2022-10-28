@@ -1,7 +1,7 @@
-use crate::math::matrix::*;
+use crate::math::{errors::MathResult, matrix::*};
 
 pub trait Layer {
-    fn forward(&self, input: &Matrix) -> Matrix;
+    fn forward(&mut self, input: Matrix) -> MathResult<Matrix>;
 
-    fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64);
+    fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix>;
 }

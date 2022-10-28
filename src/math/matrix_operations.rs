@@ -14,6 +14,10 @@ impl Matrix {
         Self::element_wise(first, second, |x, y| x * y)
     }
 
+    pub fn mul_scalar(matrix: &Matrix, scalar: f64) -> Self {
+        Self::new(matrix.rows(), matrix.cols(), |i, j| matrix.get_unchecked(i, j) * scalar)
+    }
+
     pub fn div(first: &Matrix, second: &Matrix) -> MathResult<Self> {
         Self::element_wise(first, second, |x, y| x / y)
     }
@@ -119,6 +123,24 @@ mod tests {
 
         let sum = Matrix::sub(&m1, &m2)?;
         assert!(sum == expected, "Matrix subtraction implemented incorrectly");
+        Ok(())
+    }
+
+    #[test]
+    fn matrix_operation_mul_scalar() -> MathResult<()> {
+        let m = Matrix::from_vector(&vec![
+            vec![1.0, 2.0, 3.0],
+            vec![4.0, 5.0, 6.0],
+            vec![7.0, 8.0, 9.0]
+        ])?;
+
+        let expected = Matrix::from_vector(&vec![
+            vec![ 2.0,  4.0,  6.0],
+            vec![ 8.0, 10.0, 12.0],
+            vec![14.0, 16.0, 18.0]
+        ])?;
+
+        assert!(Matrix::mul_scalar(&m, 2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
         Ok(())
     }
 
@@ -235,7 +257,7 @@ mod tests {
         ])?;
 
         m1.plus_assign(&m2)?;
-        assert!(m1 == expected, "Matrix add implemeted incorrectly");
+        assert!(m1 == expected, "Matrix add & assign implemented incorrectly");
         Ok(())
     }
 
@@ -260,7 +282,7 @@ mod tests {
         ])?;
 
         m1.minus_assign(&m2)?;
-        assert!(m1 == expected, "Matrix sub implemeted incorrectly");
+        assert!(m1 == expected, "Matrix sub & assign implemented incorrectly");
         Ok(())
     }
 
@@ -278,7 +300,7 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ])?;
 
-        assert!(m.multiplicate_assign(2.0) == &expected, "Matrix scalar multiplication implemented incorrectly");
+        assert!(m.multiplicate_assign(2.0) == &expected, "Matrix scalar multiplication & assign implemented incorrectly");
         Ok(())
     }
 
@@ -296,7 +318,7 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ])?;
 
-        assert!(m.divide_assign(2.0) == &expected, "Matrix divide by scalar implemented incorrectly");
+        assert!(m.divide_assign(2.0) == &expected, "Matrix divide by scalar & assign implemented incorrectly");
         Ok(())
     }
 
@@ -314,7 +336,7 @@ mod tests {
             vec![49.0, 64.0, 81.0]
         ])?;
 
-        assert!(Matrix::powi(&m, 2) == expected, "Matrix divide by scalar implemented incorrectly");
+        assert!(Matrix::powi(&m, 2) == expected, "Matrix power by scalar implemented incorrectly");
         Ok(())
     }
 
