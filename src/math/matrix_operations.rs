@@ -14,12 +14,16 @@ impl Matrix {
         Self::element_wise(first, second, |x, y| x * y)
     }
 
-    pub fn mul_scalar(matrix: &Matrix, scalar: f64) -> Self {
-        Self::new(matrix.rows(), matrix.cols(), |i, j| matrix.get_unchecked(i, j) * scalar)
-    }
-
     pub fn div(first: &Matrix, second: &Matrix) -> MathResult<Self> {
         Self::element_wise(first, second, |x, y| x / y)
+    }
+
+    pub fn map<Func: Fn(f64) -> f64>(matrix: &Matrix, func: Func) -> Self {
+        Self::new(matrix.rows(), matrix.cols(), |i, j| func(matrix.get_unchecked(i, j)))   
+    }
+
+    pub fn mul_scalar(matrix: &Matrix, scalar: f64) -> Self {
+        Self::map(matrix, |x| x * scalar)
     }
 
     pub fn product(first: &Matrix, second: &Matrix) -> MathResult<Self> {
@@ -58,11 +62,11 @@ impl Matrix {
     }
 
     pub fn multiplicate_assign(&mut self, scalar: f64) -> &mut Self {
-        self.element_wise_mut(|x| x * scalar)
+        self.map_assign(|x| x * scalar)
     }
 
     pub fn divide_assign(&mut self, scalar: f64) -> &mut Self {
-        self.element_wise_mut(|x| x / scalar)
+        self.map_assign(|x| x / scalar)
     }
 
     pub fn powi(matrix: &Matrix, power: i32) -> Self {

@@ -140,7 +140,7 @@ impl Matrix {
         }        
     }
 
-    pub fn element_wise_mut<Op: Fn(f64) -> f64>(&mut self, operation: Op) -> &mut Self {
+    pub fn map_assign<Op: Fn(f64) -> f64>(&mut self, operation: Op) -> &mut Self {
         for i in 0..self.content.len() {
             self.content[i] = operation(self.content[i]);
         }
