@@ -1,7 +1,7 @@
 use crate::math::{errors::MathResult, matrix::*};
 use super::layer::*;
 
-struct Dense {
+pub struct Dense {
     weight: Matrix,
     bias: Matrix,
     input: Matrix
@@ -14,7 +14,7 @@ impl Dense {
         Self {
             weight,
             bias,
-            input: Matrix::zero(0, 0)
+            input: Matrix::empty()
         }
     } 
 }
