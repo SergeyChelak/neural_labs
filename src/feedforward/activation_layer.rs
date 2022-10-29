@@ -33,10 +33,16 @@ fn sigmoid(x: f64) -> f64 {
 }
 
 impl Layer for Activation {
+    fn eval(&self, input: &Matrix) -> MathResult<Matrix> {
+        Ok(
+            Matrix::map(input, self.activation)
+        )
+    }
+
     fn forward(&mut self, input: Matrix) -> MathResult<Matrix> {
-        let matrix = Matrix::map(&input, self.activation);
+        let result = self.eval(&input);
         self.input = input;
-        Ok(matrix)
+        result
     }
 
     fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
