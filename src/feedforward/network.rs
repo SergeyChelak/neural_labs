@@ -41,7 +41,7 @@ impl FeedforwardNetwork {
                 for layer in self.layers.iter_mut().rev() {
                     grad = layer.backward(&grad, learning_rate)?;
                 }
-                error /= item.input.dimensions().rows() as f64;
+                error /= item.input.dimensions().size() as f64;
             }
             println!("{} of {}, error = {}", epoch + 1, epochs, error);
         }
@@ -60,6 +60,6 @@ fn mse(a: &Matrix, b: &Matrix) -> MathResult<f64> {
 fn mse_prime(a: &Matrix, b: &Matrix) -> MathResult<Matrix> {
     let mut tmp = Matrix::sub(b, a)?;
     let dim = tmp.dimensions();
-    tmp.multiplicate_assign(2.0 / (dim.rows() * dim.cols()) as f64);
+    tmp.multiplicate_assign(2.0 / dim.size() as f64);
     Ok(tmp)
 }
