@@ -48,6 +48,11 @@ impl Matrix {
         Ok(Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]))
     }
 
+    pub fn create_vector(vector: &Vec<f64>) -> MathResult<Self> {
+        let dims = Dimensions::new(vector.len(), 1);
+        Ok(Matrix::new(dims.rows(), dims.cols(), |i, _| vector[i]))
+    }
+
     pub fn from_scalar(scalar: f64) -> MathResult<Self> {
         Self::from_vector(&vec![vec![scalar]])
     }
