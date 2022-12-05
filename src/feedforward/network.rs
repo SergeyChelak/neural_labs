@@ -50,11 +50,11 @@ impl FeedforwardNetwork {
 }
 
 fn mse(a: &Matrix, b: &Matrix) -> MathResult<f64> {
-    let tmp = Matrix::element_wise(a, b, |x, y| {
-        let r = x - y;
-        r * r
-    })?;
-    Ok(tmp.mean())
+    Ok(
+        Matrix::sub(a, b)?
+            .powi(2)
+            .mean()
+    )
 }
 
 fn mse_prime(a: &Matrix, b: &Matrix) -> MathResult<Matrix> {

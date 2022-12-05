@@ -45,7 +45,7 @@ impl Layer for Activation {
         result
     }
 
-    fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
+    fn backward(&mut self, output_gradient: &Matrix, _learning_rate: f64) -> MathResult<Matrix> {
         let matrix = Matrix::map(&self.input, self.activation_prime);
         Matrix::mul(output_gradient, &matrix)
     }

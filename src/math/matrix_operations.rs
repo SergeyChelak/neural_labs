@@ -69,11 +69,15 @@ impl Matrix {
         self.map_assign(|x| x / scalar)
     }
 
-    pub fn powi(matrix: &Matrix, power: i32) -> Self {
-        Self::new(matrix.rows(), matrix.cols(), |i, j| {
-            f64::powi(matrix.get_unchecked(i, j), power)
-        })
+    pub fn powi(&mut self, power: i32) -> &mut Self {
+        self.map_assign(|x| x.powi(power))
     }
+
+    // pub fn powi(matrix: &Matrix, power: i32) -> Self {
+    //     Self::new(matrix.rows(), matrix.cols(), |i, j| {
+    //         f64::powi(matrix.get_unchecked(i, j), power)
+    //     })
+    // }
 }
 
 #[cfg(test)]
@@ -328,7 +332,7 @@ mod tests {
 
     #[test]
     fn matrix_operation_power_integer() -> MathResult<()> {
-        let m = Matrix::from_vector(&vec![
+        let mut m = Matrix::from_vector(&vec![
             vec![1.0, 2.0, 3.0],
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0]
@@ -340,7 +344,7 @@ mod tests {
             vec![49.0, 64.0, 81.0]
         ])?;
 
-        assert!(Matrix::powi(&m, 2) == expected, "Matrix power by scalar implemented incorrectly");
+        assert!(Matrix::powi(&mut m, 2) == &expected, "Matrix power by scalar implemented incorrectly");
         Ok(())
     }
 

@@ -21,7 +21,7 @@ impl Dense {
 
 impl Layer for Dense {
     fn eval(&self, input: &Matrix) -> MathResult<Matrix> {
-        Matrix::product(&self.weight, &self.input)
+        Matrix::product(&self.weight, &input)
     }
 
     fn forward(&mut self, input: Matrix) -> MathResult<Matrix> {
