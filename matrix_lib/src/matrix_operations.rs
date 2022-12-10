@@ -18,6 +18,7 @@ impl Matrix {
         Self::element_wise(first, second, |x, y| x / y)
     }
 
+    // TODO: refactor this method and move in matrix.rs
     pub fn map<Func: Fn(f64) -> f64>(matrix: &Matrix, func: Func) -> Self {
         Self::new(matrix.rows(), matrix.cols(), |i, j| func(matrix.get_unchecked(i, j)))   
     }
@@ -53,31 +54,25 @@ impl Matrix {
         })
     }
 
-    pub fn plus_assign(&mut self, other: &Matrix) -> MathResult<&mut Self> {
-        self.element_wise_other(other, |a, b| a + b)        
+    pub fn plus_assign(&mut self, other: &Matrix) -> MathResult<()> {
+        self.modify_other(other, |a, b| a + b)        
     }
 
-    pub fn minus_assign(&mut self, other: &Matrix) -> MathResult<&mut Self> {
-        self.element_wise_other(other, |a, b| a - b)
+    pub fn minus_assign(&mut self, other: &Matrix) -> MathResult<()> {
+        self.modify_other(other, |a, b| a - b)
     }
 
-    pub fn multiplicate_assign(&mut self, scalar: f64) -> &mut Self {
-        self.map_assign(|x| x * scalar)
+    pub fn multiplicate_assign(&mut self, scalar: f64) {
+        self.modify(|x| x * scalar)
     }
 
-    pub fn divide_assign(&mut self, scalar: f64) -> &mut Self {
-        self.map_assign(|x| x / scalar)
+    pub fn divide_assign(&mut self, scalar: f64) {
+        self.modify(|x| x / scalar)
     }
 
-    pub fn powi(&mut self, power: i32) -> &mut Self {
-        self.map_assign(|x| x.powi(power))
+    pub fn powi(&self, power: i32) -> Matrix {
+        Self::map(self, |x| x.powi(power))
     }
-
-    // pub fn powi(matrix: &Matrix, power: i32) -> Self {
-    //     Self::new(matrix.rows(), matrix.cols(), |i, j| {
-    //         f64::powi(matrix.get_unchecked(i, j), power)
-    //     })
-    // }
 }
 
 #[cfg(test)]
@@ -307,8 +302,8 @@ mod tests {
             vec![ 8.0, 10.0, 12.0],
             vec![14.0, 16.0, 18.0]
         ])?;
-
-        assert!(m.multiplicate_assign(2.0) == &expected, "Matrix scalar multiplication & assign implemented incorrectly");
+        m.multiplicate_assign(2.0);
+        assert!(m == expected, "Matrix scalar multiplication & assign implemented incorrectly");
         Ok(())
     }
 
@@ -325,8 +320,8 @@ mod tests {
             vec![ 8.0, 10.0, 12.0],
             vec![14.0, 16.0, 18.0]
         ])?;
-
-        assert!(m.divide_assign(2.0) == &expected, "Matrix divide by scalar & assign implemented incorrectly");
+        m.divide_assign(2.0);
+        assert!(m == expected, "Matrix divide by scalar & assign implemented incorrectly");
         Ok(())
     }
 
@@ -343,8 +338,8 @@ mod tests {
             vec![16.0, 25.0, 36.0],
             vec![49.0, 64.0, 81.0]
         ])?;
-
-        assert!(Matrix::powi(&mut m, 2) == &expected, "Matrix power by scalar implemented incorrectly");
+        m = m.powi(2);
+        assert!(m == expected, "Matrix power by scalar implemented incorrectly");
         Ok(())
     }
 

@@ -84,6 +84,7 @@ impl Matrix {
         row * self.dimensions.cols + col
     }
 
+    //  TODO: make as an external function map(a, b, operation) -> MathResult<..>
     pub fn element_wise<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
         if a.is_same_size(&b) {
             let size = a.content.len();
@@ -102,22 +103,21 @@ impl Matrix {
         }
     }
 
-    pub fn element_wise_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<&mut Self> {
+    pub fn modify_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<()> {
         if self.is_same_size(other) {
             for i in 0..self.content.len() {
                 self.content[i] = operation(self.content[i], other.content[i]);
             }
-            Ok(self)
+            Ok(())
         } else {
             Err(MathError::IncorrectMatricesDimensions("element wise mut".to_string(), self.dimensions, other.dimensions))
         }        
     }
 
-    pub fn map_assign<Op: Fn(f64) -> f64>(&mut self, operation: Op) -> &mut Self {
+    pub fn modify<Op: Fn(f64) -> f64>(&mut self, operation: Op) {
         for i in 0..self.content.len() {
             self.content[i] = operation(self.content[i]);
         }
-        self 
     }
 
     pub fn mean(&self) -> f64 {
