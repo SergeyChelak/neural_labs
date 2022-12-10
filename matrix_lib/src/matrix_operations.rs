@@ -2,14 +2,8 @@ use super::matrix::Matrix;
 use super::errors::*;
 
 impl Matrix {
-    // TODO: refactor this method and move in matrix.rs
-    pub fn map<Func: Fn(f64) -> f64>(matrix: &Matrix, func: Func) -> Self {
-        Self::new(matrix.rows(), matrix.cols(), |i, j| func(matrix.get_unchecked(i, j)))   
-    }
-
-    // TODO: refactor
-    pub fn mul_scalar(matrix: &Matrix, scalar: f64) -> Self {
-        Self::map(matrix, |x| x * scalar)
+    pub fn mul_scalar(&self, scalar: f64) -> Self {
+        self.map(|x| x * scalar)
     }
 
     pub fn transpose(&self) -> Matrix {
@@ -58,7 +52,7 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ])?;
 
-        assert!(Matrix::mul_scalar(&m, 2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
+        assert!(m.mul_scalar(2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
         Ok(())
     }
 

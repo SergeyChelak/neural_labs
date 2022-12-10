@@ -84,6 +84,17 @@ impl Matrix {
         row * self.dimensions.cols + col
     }
 
+    pub fn map<Op: Fn(f64) -> f64>(&self, operation: Op) -> Self {
+        let content = self.content
+                    .iter()
+                    .map(|x| operation(*x))
+                    .collect();
+        Self {
+            dimensions: self.dimensions,
+            content,
+        }
+    }
+
     pub fn modify_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<()> {
         if self.is_same_size(other) {
             for i in 0..self.content.len() {
