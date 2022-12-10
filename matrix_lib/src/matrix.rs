@@ -10,7 +10,7 @@ pub struct Matrix {
 }
 
 impl Matrix {
-    // initializers
+    /// primary initializer
     pub fn new<P>(rows: usize, cols: usize, mut producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
         let mut content = vec![0.0f64; rows * cols];
         for i in 0..rows {
@@ -20,45 +20,13 @@ impl Matrix {
         }
         Matrix {
             dimensions: Dimensions::new(rows, cols),
-            content: content,
+            content,
         }
     }
 
-    pub fn new_square<P>(dimension: usize, producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
-        Self::new(dimension, dimension, producer)
-    }
-
-    pub fn identity(dimension: usize) -> Self {
-        Self::new_square(
-            dimension,
-            |row, col| if row == col { 1.0 } else { 0.0 }
-        )
-    }
-
-    pub fn diagonal(vector: &Vec<f64>) -> Self {
-        let dimension = vector.len();
-        Self::new_square(
-            dimension,
-            |row, col| if row == col { vector[row] } else { 0.0 }
-        )
-    }
-
-    pub fn from_vector(vector: &Vec<Vec<f64>>) -> MathResult<Self> {
-        let dims = Dimensions::from_vector(vector)?;
-        Ok(Matrix::new(dims.rows(), dims.cols(), |i, j| vector[i][j]))
-    }
-
-    pub fn create_vector(vector: &Vec<f64>) -> MathResult<Self> {
+    pub fn vector(vector: &Vec<f64>) -> MathResult<Self> {
         let dims = Dimensions::new(vector.len(), 1);
         Ok(Matrix::new(dims.rows(), dims.cols(), |i, _| vector[i]))
-    }
-
-    pub fn from_scalar(scalar: f64) -> MathResult<Self> {
-        Self::from_vector(&vec![vec![scalar]])
-    }
-
-    pub fn zero(rows: usize, cols: usize) -> Self {
-        Self::new(rows, cols, |_, _| 0.0)
     }
 
     // properties and accessors
@@ -116,40 +84,32 @@ impl Matrix {
         row * self.dimensions.cols + col
     }
 
-    pub fn element_wise<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
-        if a.is_same_size(&b) {
-            let size = a.content.len();
-            let mut vector = vec![0.0; size];
-            for i in 0..size {
-                vector[i] = operation(a.content[i], b.content[i]);
-            }
-            Ok(
-                Matrix { 
-                    dimensions: a.dimensions, 
-                    content: vector 
-                }
-            )
-        } else {
-            Err(MathError::IncorrectMatricesDimensions("element wise".to_string(), a.dimensions, b.dimensions))
+    pub fn map<Op: Fn(f64) -> f64>(&self, operation: Op) -> Self {
+        let content = self.content
+                    .iter()
+                    .map(|x| operation(*x))
+                    .collect();
+        Self {
+            dimensions: self.dimensions,
+            content,
         }
     }
 
-    pub fn element_wise_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<&mut Self> {
+    pub fn modify_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<()> {
         if self.is_same_size(other) {
             for i in 0..self.content.len() {
                 self.content[i] = operation(self.content[i], other.content[i]);
             }
-            Ok(self)
+            Ok(())
         } else {
             Err(MathError::IncorrectMatricesDimensions("element wise mut".to_string(), self.dimensions, other.dimensions))
         }        
     }
 
-    pub fn map_assign<Op: Fn(f64) -> f64>(&mut self, operation: Op) -> &mut Self {
+    pub fn modify<Op: Fn(f64) -> f64>(&mut self, operation: Op) {
         for i in 0..self.content.len() {
             self.content[i] = operation(self.content[i]);
         }
-        self 
     }
 
     pub fn mean(&self) -> f64 {
@@ -175,6 +135,24 @@ impl std::ops::IndexMut<usize> for Matrix {
     }
 }
 
+pub fn map<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
+    if a.is_same_size(&b) {
+        let size = a.content.len();
+        let mut vector = vec![0.0; size];
+        for i in 0..size {
+            vector[i] = operation(a.content[i], b.content[i]);
+        }
+        Ok(
+            Matrix { 
+                dimensions: a.dimensions, 
+                content: vector 
+            }
+        )
+    } else {
+        Err(MathError::IncorrectMatricesDimensions("element wise".to_string(), a.dimensions, b.dimensions))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -191,107 +169,6 @@ mod tests {
                 assert_eq!(m[i][j], value, "Unexpected matrix value");
             }
         }
-    }
-
-    #[test]
-    fn matrix_init_square() {
-        let dim: usize = 4;
-        let m = Matrix::new_square(dim, |_, _| 0.0);
-        assert_eq!(m.rows(), m.cols(), "Matrix is not square")
-    }
-
-    #[test]
-    fn matrix_init_zero_matrix() {
-        let matrix = Matrix::zero(2, 2);
-        let zero_bits = 0.0f64.to_bits();
-        for i in 0..matrix.rows() {
-            for j in 0..matrix.cols() {
-                assert_eq!(
-                    matrix[i][j].to_bits(),
-                    zero_bits,
-                    "Zero matrix contains non-zero elements"
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn matrix_init_identity() {
-        let matrix = Matrix::identity(5);
-        assert_eq!(matrix.rows(), matrix.cols(), "Matrix isn't square");
-        for i in 0..matrix.rows() {
-            for j in 0..matrix.cols() {
-                let value = matrix[i][j];
-                if i == j {
-                    assert!(
-                        f64::abs(value - 1.0) < f64::EPSILON,
-                        "Diagonal element is not 1"
-                    );
-                } else {
-                    assert!(
-                        f64::abs(value) < f64::EPSILON,
-                        "Non-diagonal element is not 0"
-                    );
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn matrix_init_diagonal() {
-        let diagonal_vector = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
-        let clone = diagonal_vector.clone();
-        let matrix = Matrix::diagonal(&diagonal_vector);
-        assert_eq!(
-            matrix.rows(),
-            clone.len(),
-            "Incorrect rows count in diagonal matrix"
-        );
-        assert_eq!(
-            matrix.cols(),
-            clone.len(),
-            "Incorrect cols count in diagonal matrix"
-        );
-        for i in 0..matrix.rows() {
-            for j in 0..matrix.cols() {
-                let value = matrix[i][j];
-                if i == j {
-                    assert!(f64::abs(value - clone[i]) < f64::EPSILON, "Non-diagonal element is not equals to correspoing item of initializer vector");
-                } else {
-                    assert!(
-                        f64::abs(value) < f64::EPSILON,
-                        "Non-diagonal element is not 0"
-                    );
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn matrix_init_from_vector() -> MathResult<()> {
-        let v = vec![
-            vec![1.0, 2.0, 3.0], 
-            vec![2.0, 3.0, 4.0]
-        ];
-        let matrix = Matrix::from_vector(&v)?;
-        assert_eq!(matrix.rows(), 2, "Incorrect rows count");
-        assert_eq!(matrix.cols(), 3, "Incorrect cols count");
-        for i in 0..matrix.rows() {
-            for j in 0..matrix.cols() {
-                assert_eq!(matrix[i][j], v[i][j], "Value of matrix doesn't correspond to original value");
-            }
-        }
-        Ok(())
-    }
-
-    #[test]
-    fn matrix_init_from_incorrect_vector() -> MathResult<()> {
-        let v = vec![
-            vec![1.0, 2.0, 3.0], 
-            vec![2.0, 3.0]
-        ];
-        assert_eq!(Matrix::from_vector(&v), Err(MathError::IncorrectVectorDimensions));
-        Ok(())
     }
 
     #[test]
