@@ -48,6 +48,11 @@ impl Dimensions {
     pub fn cols(&self) -> usize {
         self.cols
     }
+
+    #[inline(always)]
+    pub fn size(&self) -> usize {
+        self.rows * self.cols
+    }
 }
 
 impl PartialEq for Dimensions {

@@ -2,9 +2,13 @@ use super::matrix::Matrix;
 use rand::Rng;
 
 impl Matrix {    
-    pub fn random(rows: usize, cols: usize) -> Matrix {
+    pub fn random(rows: usize, cols: usize) -> Self {
         let mut rng = rand::thread_rng();
         Matrix::new(rows, cols, |_, _| rng.gen::<f64>())
+    }
+
+    pub fn empty() -> Self {
+        Matrix::zero(0, 0)
     }
 }
 
