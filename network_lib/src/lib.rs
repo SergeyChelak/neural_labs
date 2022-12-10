@@ -4,6 +4,7 @@ pub mod activation_layer;
 pub mod data_source;
 pub mod network;
 
+// TODO: make as integration test
 #[cfg(test)]
 mod tests {
     use super::{

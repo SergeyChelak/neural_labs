@@ -1,6 +1,7 @@
 use super::matrix::Matrix;
 use super::errors::*;
 
+// TODO: implement as operator's overload
 impl Matrix {
     pub fn plus_assign(&mut self, other: &Matrix) -> MathResult<()> {
         self.modify_other(other, |a, b| a + b)        
