@@ -10,7 +10,7 @@ pub struct Matrix {
 }
 
 impl Matrix {
-    // initializers
+    /// primary initializer
     pub fn new<P>(rows: usize, cols: usize, mut producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
         let mut content = vec![0.0f64; rows * cols];
         for i in 0..rows {
@@ -24,7 +24,7 @@ impl Matrix {
         }
     }
 
-    pub fn create_vector(vector: &Vec<f64>) -> MathResult<Self> {
+    pub fn vector(vector: &Vec<f64>) -> MathResult<Self> {
         let dims = Dimensions::new(vector.len(), 1);
         Ok(Matrix::new(dims.rows(), dims.cols(), |i, _| vector[i]))
     }

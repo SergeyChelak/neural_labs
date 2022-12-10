@@ -5,7 +5,8 @@ use super::{
 };
 use rand::Rng;
 
-impl Matrix {    
+impl Matrix {  
+    /// convenience initializers
     pub fn new_square<P>(dimension: usize, producer: P) -> Self where P: FnMut(usize, usize) -> f64 {
         Self::new(dimension, dimension, producer)
     }

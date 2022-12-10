@@ -11,10 +11,10 @@ use matrix_lib::{
 
 fn xor_data_source() -> MathResult<TrainDataSource> {
     let mut data = TrainDataSource::new();
-    data.push(Matrix::create_vector(&vec![0.0, 0.0])?, Matrix::create_vector(&vec![0.0])?);
-    data.push(Matrix::create_vector(&vec![1.0, 0.0])?, Matrix::create_vector(&vec![1.0])?);
-    data.push(Matrix::create_vector(&vec![0.0, 1.0])?, Matrix::create_vector(&vec![1.0])?);
-    data.push(Matrix::create_vector(&vec![1.0, 1.0])?, Matrix::create_vector(&vec![0.0])?);
+    data.push(Matrix::vector(&vec![0.0, 0.0])?, Matrix::vector(&vec![0.0])?);
+    data.push(Matrix::vector(&vec![1.0, 0.0])?, Matrix::vector(&vec![1.0])?);
+    data.push(Matrix::vector(&vec![0.0, 1.0])?, Matrix::vector(&vec![1.0])?);
+    data.push(Matrix::vector(&vec![1.0, 1.0])?, Matrix::vector(&vec![0.0])?);
     Ok(data)
 }
 
