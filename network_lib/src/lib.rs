@@ -39,8 +39,8 @@ mod tests {
             Box::new(Activation::tanh()),
         ]);
         let data_source = xor_data_source()?;
-        _ = network.train(30_000, 0.1, &data_source);
-        let eps = 1e-2;
+        _ = network.train(30_000, 0.05, &data_source);
+        let eps = 1e-1;
         for item in data_source.content() {
             let input = &item.input;
             let eval = network.eval(input)?;
