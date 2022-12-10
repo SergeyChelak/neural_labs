@@ -2,7 +2,7 @@ use super::{
     layer::Layer,
     data_source::TrainDataSource,
 };
-use crate::math::{
+use matrix_lib::{
     matrix::Matrix,
     errors::MathResult,
 };

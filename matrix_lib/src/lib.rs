@@ -1,14 +1,9 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+// Linear algebra and math functions module
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub mod errors;
+pub mod dimensions;
+pub mod matrix;
+pub mod matrix_debug;
+pub mod matrix_eq;
+pub mod matrix_utils;
+pub mod matrix_operations;

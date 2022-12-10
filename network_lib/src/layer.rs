@@ -1,4 +1,7 @@
-use crate::math::{errors::MathResult, matrix::*};
+use matrix_lib::{
+    errors::MathResult, 
+    matrix::*
+};
 
 pub trait Layer {
     fn eval(&self, input: &Matrix) -> MathResult<Matrix>;

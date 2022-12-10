@@ -1,13 +1,10 @@
-mod math;
-mod feedforward;
-
-use feedforward::{
+use network_lib::{
     dense_layer::Dense,
     activation_layer::Activation, 
     network::FeedforwardNetwork,
     data_source::TrainDataSource
 };
-use math::{
+use matrix_lib::{
     errors::MathResult, 
     matrix::Matrix
 };

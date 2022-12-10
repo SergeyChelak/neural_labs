@@ -1,4 +1,7 @@
-use crate::math::{errors::MathResult, matrix::*};
+use matrix_lib::{
+    errors::MathResult, 
+    matrix::*
+};
 use super::layer::*;
 
 pub struct Activation {

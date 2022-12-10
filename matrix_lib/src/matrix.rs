@@ -177,8 +177,6 @@ impl std::ops::IndexMut<usize> for Matrix {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::errors::MathError;
-
     use super::*;
 
     #[test]
