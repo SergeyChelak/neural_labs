@@ -1,4 +1,6 @@
-use crate::math::matrix::Matrix;
+use matrix_lib::{
+    matrix::Matrix
+};
 
 pub struct TrainItem {
     pub input: Matrix,
