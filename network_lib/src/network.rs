@@ -28,8 +28,9 @@ impl FeedforwardNetwork {
         Ok(output)
     }
 
-    pub fn train(&mut self, epochs: usize, learning_rate: f64, data_source: &TrainDataSource) -> MathResult<()>{
-        for epoch in 0..epochs {
+    pub fn train(&mut self, epochs: usize, learning_rate: f64, data_source: &TrainDataSource) -> MathResult<f64> {
+        let mut global_error = f64::NAN;
+        for _ in 0..epochs {
             let mut error: f64 = 0.0;
             let data = data_source.content();
             for item in data {
@@ -44,9 +45,9 @@ impl FeedforwardNetwork {
                 }
                 error /= item.input.dimensions().size() as f64;
             }
-            println!("{} of {}, error = {}", epoch + 1, epochs, error);
+            global_error = error;
         }
-        Ok(())
+        Ok(global_error)
     }
 }
 
