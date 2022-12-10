@@ -4,6 +4,7 @@ use super::{
 };
 use matrix_lib::{
     matrix::Matrix,
+    matrix_functions::*,
     errors::MathResult,
 };
 
@@ -51,14 +52,14 @@ impl FeedforwardNetwork {
 
 fn mse(a: &Matrix, b: &Matrix) -> MathResult<f64> {
     Ok(
-        Matrix::sub(a, b)?
+        sub(a, b)?
             .powi(2)
             .mean()
     )
 }
 
 fn mse_prime(a: &Matrix, b: &Matrix) -> MathResult<Matrix> {
-    let mut tmp = Matrix::sub(b, a)?;
+    let mut tmp = sub(b, a)?;
     let dim = tmp.dimensions();
     tmp.multiplicate_assign(2.0 / dim.size() as f64);
     Ok(tmp)

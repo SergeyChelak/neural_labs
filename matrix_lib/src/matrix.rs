@@ -84,25 +84,6 @@ impl Matrix {
         row * self.dimensions.cols + col
     }
 
-    //  TODO: make as an external function map(a, b, operation) -> MathResult<..>
-    pub fn element_wise<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
-        if a.is_same_size(&b) {
-            let size = a.content.len();
-            let mut vector = vec![0.0; size];
-            for i in 0..size {
-                vector[i] = operation(a.content[i], b.content[i]);
-            }
-            Ok(
-                Matrix { 
-                    dimensions: a.dimensions, 
-                    content: vector 
-                }
-            )
-        } else {
-            Err(MathError::IncorrectMatricesDimensions("element wise".to_string(), a.dimensions, b.dimensions))
-        }
-    }
-
     pub fn modify_other<Op: Fn(f64, f64) -> f64>(&mut self, other: &Matrix, operation: Op) -> MathResult<()> {
         if self.is_same_size(other) {
             for i in 0..self.content.len() {
@@ -140,6 +121,24 @@ impl std::ops::IndexMut<usize> for Matrix {
         let cols = self.cols();
         let pos = index * cols;
         self.content[pos..pos + cols].as_mut()
+    }
+}
+
+pub fn map<Op: Fn(f64, f64) -> f64>(a: &Matrix, b: &Matrix, operation: Op) -> MathResult<Matrix> {
+    if a.is_same_size(&b) {
+        let size = a.content.len();
+        let mut vector = vec![0.0; size];
+        for i in 0..size {
+            vector[i] = operation(a.content[i], b.content[i]);
+        }
+        Ok(
+            Matrix { 
+                dimensions: a.dimensions, 
+                content: vector 
+            }
+        )
+    } else {
+        Err(MathError::IncorrectMatricesDimensions("element wise".to_string(), a.dimensions, b.dimensions))
     }
 }
 

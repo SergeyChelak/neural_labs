@@ -1,6 +1,7 @@
 use matrix_lib::{
     errors::MathResult, 
-    matrix::*
+    matrix::*,
+    matrix_functions::mul,
 };
 use super::layer::*;
 
@@ -50,6 +51,6 @@ impl Layer for Activation {
 
     fn backward(&mut self, output_gradient: &Matrix, _learning_rate: f64) -> MathResult<Matrix> {
         let matrix = Matrix::map(&self.input, self.activation_prime);
-        Matrix::mul(output_gradient, &matrix)
+        mul(output_gradient, &matrix)
     }
 }

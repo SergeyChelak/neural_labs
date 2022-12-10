@@ -1,6 +1,7 @@
 use matrix_lib::{
     errors::MathResult, 
-    matrix::*
+    matrix::*,
+    matrix_functions::product,
 };
 use super::layer::*;
 
@@ -24,7 +25,7 @@ impl Dense {
 
 impl Layer for Dense {
     fn eval(&self, input: &Matrix) -> MathResult<Matrix> {
-        let mut prod = Matrix::product(&self.weight, &input)?;
+        let mut prod = product(&self.weight, &input)?;
         prod.plus_assign(&self.bias)?;
         Ok(prod)
     }
@@ -35,7 +36,7 @@ impl Layer for Dense {
     }
 
     fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
-        let weight_gradient = Matrix::product(output_gradient, &self.input.transpose())?;
+        let weight_gradient = product(output_gradient, &self.input.transpose())?;
         _ = self.weight.minus_assign(
             &Matrix::mul_scalar(&weight_gradient, learning_rate)
         );
@@ -44,6 +45,6 @@ impl Layer for Dense {
             &Matrix::mul_scalar(&output_gradient, learning_rate)
         );
 
-        Matrix::product(&self.weight.transpose(), output_gradient)
+        product(&self.weight.transpose(), output_gradient)
     }
 }
