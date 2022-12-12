@@ -62,6 +62,6 @@ fn mse(a: &Matrix, b: &Matrix) -> MathResult<f64> {
 fn mse_prime(a: &Matrix, b: &Matrix) -> MathResult<Matrix> {
     let mut tmp = b.sub(a)?;
     let dim = tmp.dimensions();
-    tmp.multiplicate_assign(2.0 / dim.size() as f64);
+    tmp *= 2.0 / dim.size() as f64;
     Ok(tmp)
 }
