@@ -4,6 +4,29 @@ use super::{
     errors::*,
 };
 
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        if self.is_same_size(other) {
+            let rows = self.rows();
+            let cols = self.cols();
+            for i in 0..rows {
+                for j in 0..cols {
+                    if (self[i][j] - other[i][j]).abs() > f64::EPSILON {
+                        return false;
+                    }
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Eq for Matrix {
+    //
+}
+
 impl Matrix {
     pub fn add(&self, other: &Matrix) -> MathResult<Self> {
         add(self, other)
