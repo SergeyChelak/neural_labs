@@ -1,6 +1,7 @@
 use matrix_lib::{
     errors::MathResult, 
     matrix::*,
+    matrix_functions::*,
 };
 use super::layer::*;
 

@@ -13,14 +13,6 @@ impl Matrix {
         sub(self, other)
     }
 
-    pub fn mul(&self, other: &Matrix) -> MathResult<Self> {
-        mul(self, other)
-    }
-
-    pub fn mul_scalar(&self, scalar: f64) -> Self {
-        self.map(|x| x * scalar)
-    }
-
     pub fn div(&self, other: &Matrix) -> MathResult<Self> {
         div(self, other)
     }
@@ -38,6 +30,25 @@ impl Matrix {
 
     pub fn powi(&self, power: i32) -> Self {
         Self::map(self, |x| x.powi(power))
+    }
+}
+
+pub trait MatrixMultiplication<T> {
+    type ResultType;
+    fn mul(&self, value: T) -> Self::ResultType;
+}
+
+impl MatrixMultiplication<f64> for Matrix {
+    type ResultType = Matrix;
+    fn mul(&self, value: f64) -> Self::ResultType {
+        self.map(|x| x * value)
+    }
+}
+
+impl MatrixMultiplication<&Matrix> for Matrix {
+    type ResultType = MathResult<Matrix>;
+    fn mul(&self, value: &Matrix) -> Self::ResultType {
+        mul(self, value)
     }
 }
 
@@ -241,7 +252,7 @@ mod tests {
             vec![14.0, 16.0, 18.0]
         ])?;
 
-        assert!(m.mul_scalar(2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
+        assert!(m.mul(2.0) == expected, "Matrix scalar multiplication implemented incorrectly");
         Ok(())
     }
 
