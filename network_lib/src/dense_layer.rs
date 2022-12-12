@@ -26,7 +26,7 @@ impl Dense {
 impl Layer for Dense {
     fn eval(&self, input: &Matrix) -> MathResult<Matrix> {
         let mut prod = product(&self.weight, &input)?;
-        prod.plus_assign(&self.bias)?;
+        prod += &self.bias;
         Ok(prod)
     }
 
@@ -37,8 +37,8 @@ impl Layer for Dense {
 
     fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
         let weight_gradient = product(output_gradient, &self.input.transpose())?;
-        self.weight.minus_assign(&weight_gradient.mul(learning_rate))?;
-        self.bias.minus_assign(&output_gradient.mul(learning_rate))?;
+        self.weight.sub_assign(&weight_gradient.mul(learning_rate))?;
+        self.bias.sub_assign(&output_gradient.mul(learning_rate))?;
         self.weight.transpose().product(output_gradient)
     }
 }
