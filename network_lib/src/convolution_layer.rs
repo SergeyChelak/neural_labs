@@ -2,14 +2,16 @@ use super::layer::*;
 use matrix_lib::{
     dimensions::Dimensions, 
     errors::*,
-    matrix::Matrix, matrix_convenience::random_matrices,
+    matrix::Matrix, 
+    matrix_convenience::*,
 };
 
 pub struct Convolution {
     input_depth: usize,
-    kernels: Vec<Matrix>,
+    depth: usize,
+    kernels: Vec<Vec<Matrix>>,
     biases: Vec<Matrix>,
-    input: Matrix,
+    input: Vec<Matrix>,
 }
 
 impl Convolution {
@@ -21,19 +23,27 @@ impl Convolution {
         );
         Self {
             input_depth,
-            kernels: random_matrices(depth, kernel_dimension),
+            depth,
+            kernels: random_matrices2d(Dimensions::new(depth, input_depth), kernel_dimension),
             biases: random_matrices(depth, output_dimension),
-            input: Matrix::empty(),
+            input: vec![],
         }
     }
-}
-
-impl Layer for Convolution {
-    fn eval(&self, input: &Matrix) -> MathResult<Matrix> {
-        todo!()
+// }
+//
+// TODO: make layer with generic input parameter... 
+// impl Layer for Convolution {
+    fn eval(&self, input: &Vec<Matrix>) -> MathResult<Vec<Matrix>> {
+        let mut output = self.biases.clone();
+        for i in 0..self.depth {
+            for j in 0..self.input_depth {
+                output[i] += correlate2d(&self.input[j], &self.kernels[i][j]);
+            }
+        }
+        Ok(output)
     }
 
-    fn forward(&mut self, input: Matrix) -> MathResult<Matrix> {
+    fn forward(&mut self, input: Vec<Matrix>) -> MathResult<Vec<Matrix>> {
         self.input = input;
         self.eval(&self.input)
     }
@@ -41,4 +51,8 @@ impl Layer for Convolution {
     fn backward(&mut self, output_gradient: &Matrix, learning_rate: f64) -> MathResult<Matrix> {
         todo!()
     }
+}
+
+fn correlate2d(input: &Matrix, kernel: &Matrix) -> Matrix {
+    todo!()
 }

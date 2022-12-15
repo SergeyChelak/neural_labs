@@ -57,3 +57,11 @@ pub fn random_matrices(amount: usize, dimensions: Dimensions) -> Vec<Matrix> {
     }
     result
 }
+
+pub fn random_matrices2d(output_dim: Dimensions, matrix_dim: Dimensions) -> Vec<Vec<Matrix>> {
+    let mut result: Vec<Vec<Matrix>> = Vec::with_capacity(output_dim.rows());
+    for _ in 0..output_dim.rows() {
+        result.push(random_matrices(output_dim.cols(), matrix_dim));
+    }
+    result
+}
