@@ -48,3 +48,12 @@ impl Matrix {
         Self::from_vector(&vec![vec![scalar]])
     }
 }
+
+pub fn random_matrices(amount: usize, dimensions: Dimensions) -> Vec<Matrix> {
+    let mut result: Vec<Matrix> = Vec::with_capacity(amount);
+    for _ in 0..amount {
+        let item = Matrix::random(dimensions.rows(), dimensions.cols());
+        result.push(item);
+    }
+    result
+}
