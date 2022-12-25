@@ -23,7 +23,7 @@ fn convolution_cross_correlation1() -> MathResult<()> {
         vec![4.0, 5.0],
     ])?;
 
-    let result = cross_correlation(&input, &kernel);
+    let result = cross_correlation(&input, &kernel)?;
     assert!(expected == result, "Cross-corrleation calculated incorrectly");
     Ok(())
 }
@@ -50,7 +50,7 @@ fn convolution_cross_correlation2() -> MathResult<()> {
         vec![ 9.0,  6.0, 14.0],
     ])?;
 
-    let result = cross_correlation(&input, &kernel);
+    let result = cross_correlation(&input, &kernel)?;
     assert!(expected == result, "Cross-corrleation calculated incorrectly");
     Ok(())
 }

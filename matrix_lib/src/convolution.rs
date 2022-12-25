@@ -1,9 +1,10 @@
 use super::{
     matrix::Matrix,
+    errors::MathResult,
     dimensions::Dimensions,
 };
 
-pub fn cross_correlation(input: &Matrix, kernel: &Matrix) -> Matrix {
+pub fn cross_correlation(input: &Matrix, kernel: &Matrix) -> MathResult<Matrix> {
     let (input_rows, input_cols) = input.dimensions().as_tuple();
     let (kernel_rows, kernel_cols) = kernel.dimensions().as_tuple();
     // TODO: add guard that validates matrix & kernel sizes
@@ -23,5 +24,5 @@ pub fn cross_correlation(input: &Matrix, kernel: &Matrix) -> Matrix {
             output.set_unchecked(out_i, out_j, sum);
         }
     }
-    output
+    Ok(output)
 }
