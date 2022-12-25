@@ -53,6 +53,10 @@ impl Dimensions {
     pub fn size(&self) -> usize {
         self.rows * self.cols
     }
+
+    pub fn as_tuple(&self) -> (usize, usize) {
+        (self.rows, self.cols)
+    }
 }
 
 impl PartialEq for Dimensions {

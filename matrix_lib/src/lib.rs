@@ -7,3 +7,4 @@ pub mod matrix_debug;
 pub mod matrix_convenience;
 pub mod matrix_functions;
 pub mod matrix_modifiers;
+pub mod convolution;
