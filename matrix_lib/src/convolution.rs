@@ -1,13 +1,17 @@
 use super::{
     matrix::Matrix,
-    errors::MathResult,
+    errors::*,
     dimensions::Dimensions,
 };
 
 pub fn cross_correlation(input: &Matrix, kernel: &Matrix) -> MathResult<Matrix> {
     let (input_rows, input_cols) = input.dimensions().as_tuple();
     let (kernel_rows, kernel_cols) = kernel.dimensions().as_tuple();
-    // TODO: add guard that validates matrix & kernel sizes
+    if input_rows < kernel_rows || input_cols < kernel_cols {
+        return Err(MathError::IncorrectMatricesDimensions(
+            "Cross Correlation".to_string(), input.dimensions(), kernel.dimensions())
+        );
+    }
     let (rows, cols) = Dimensions::new(
         input_rows - kernel_rows + 1,
         input_cols - kernel_cols + 1
