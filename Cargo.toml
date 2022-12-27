@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "tensor_lib",
     "matrix_lib",
     "network_lib",
     "labs",
