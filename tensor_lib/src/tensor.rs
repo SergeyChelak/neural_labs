@@ -9,10 +9,29 @@ pub struct Tensor<T> {
     shape_offsets: TensorShape,
 }
 
+impl<T> Tensor<T>  {
+    pub fn empty() -> Self {
+        Self {
+            buffer: vec![],
+            shape: vec![],
+            shape_offsets: vec![],
+        }
+    }   
+}
+
 impl<T: Copy> Tensor<T> {
-    pub fn new(shape: TensorShape) -> Self {
-        let shape_offs = Self::shape_offsets(&shape);
-        todo!("create new tesor filled with zeros")
+    pub fn new(shape: TensorShape, value: T) -> Self {
+        if shape.len() == 0 {
+            return Self::empty();
+        }
+        let shape_offsets = Self::shape_offsets(&shape);
+        let buffer_size = shape.iter().fold(1, |acc, v| acc * v);
+        let buffer = vec![value; buffer_size];
+        Self {
+            buffer,
+            shape,
+            shape_offsets
+        }
     }
 
     fn shape_offsets(shape: &TensorShape) -> TensorShape {
@@ -36,8 +55,19 @@ impl<T: Copy> Tensor<T> {
         });
     }
 
-    pub fn pair_wise<F>(&self, other: &Tensor<T>) -> TensorResult<Tensor<T>> where F: Fn(T) -> T {
-        todo!("tensor pair wise")
+    pub fn pair_wise<F>(&self, other: &Tensor<T>, func: F) -> TensorResult<Self> where F: Fn(T, T) -> T {
+        if self.is_same_shape(other) {
+            return Err(TensorError::IncompatibleTensorShapes);
+        }
+        let buffer: Vec<T> = self.buffer.iter()
+            .zip(other.buffer.iter())
+            .map(|(slf, othr)| func(*slf, *othr))
+            .collect();
+        Ok(Self {
+            buffer,
+            shape: self.shape.clone(),
+            shape_offsets: self.shape_offsets.clone(),
+        })
     }
 
     pub fn get(&self, index: &TensorIndex) -> TensorResult<T> {
@@ -102,8 +132,4 @@ impl<T: Copy> Tensor<T> {
     pub fn is_same_rank(&self, other: &Tensor<T>) -> bool {
         self.rank() != other.rank()
     }
-}
-
-impl<T: Copy> Tensor<T> {
-    
 }
