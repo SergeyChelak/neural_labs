@@ -41,40 +41,35 @@ fn tensor_create_2d() -> TensorResult<()> {
     Ok(())
 }
 
-// #[test]
-// fn tensor_create_3d() {
-//     let matrix3d = vec![
-//         vec![
-//             vec![1.0, 0.0, 1.0],
-//             vec![2.0, 1.0, 1.0],
-//             vec![0.0, 1.0, 1.0],
-//             vec![1.0, 1.0, 2.0],
-//         ],
-//         vec![
-//             vec![5.0, 1.0, 3.0],
-//             vec![6.0, 2.0, 4.0],
-//             vec![7.0, 3.0, 5.0],
-//             vec![8.0, 4.0, 6.0],
-//         ],
-//         vec![
-//             vec![1.9, 0.0, 1.9],
-//             vec![2.8, 1.9, 1.9],
-//             vec![0.0, 1.9, 1.9],
-//             vec![1.9, 1.9, 2.8],
-//         ],
-//     ];
-//     let tensor = Tensor::new(vec![3, 4, 3], |indicies| {
-//         let depth = indicies[0];
-//         let row = indicies[1];
-//         let col = indicies[2];
-//         matrix3d[depth][row][col]
-//     });
-//     assert_eq!(tensor.rank(), 3, "Tensor 3D dimensions are wrong");
-//     for d in 0..matrix3d.len() {
-//         for i in 0..matrix3d[d].len() {
-//             for j in 0..matrix3d[d][i].len() {
-//                 assert_eq!(tensor[d][i][j].value().unwrap(), matrix3d[d][i][j], "Tensor for matrix filled incorrectly");
-//             }
-//         }
-//     }
-// }
+#[test]
+fn tensor_create_3d() -> TensorResult<()> {
+    let arr = vec![
+        vec![
+            vec![1.0, 0.0, 1.0],
+            vec![2.0, 1.0, 1.0],
+            vec![0.0, 1.0, 1.0],
+            vec![1.0, 1.0, 2.0],
+        ],
+        vec![
+            vec![5.0, 1.0, 3.0],
+            vec![6.0, 2.0, 4.0],
+            vec![7.0, 3.0, 5.0],
+            vec![8.0, 4.0, 6.0],
+        ],
+        vec![
+            vec![1.9, 0.0, 1.9],
+            vec![2.8, 1.9, 1.9],
+            vec![0.0, 1.9, 1.9],
+            vec![1.9, 1.9, 2.8],
+        ],
+    ];
+    let tensor = Tensor::tensor3d(&arr)?;
+    for d in 0..arr.len() {
+        for i in 0..arr[d].len() {
+            for j in 0..arr[d][i].len() {
+                assert_eq!(tensor.get(&vec![d, i, j])?, arr[d][i][j], "Tensor for matrix filled incorrectly");
+            }
+        }
+    }
+    Ok(())
+}
