@@ -1,40 +1,40 @@
-// extern crate tensor_lib;
+extern crate tensor_lib;
 
 // use std::env;
 
-// use tensor_lib::{
-//     tensor::*,
-// };
+use tensor_lib::{
+    tensor::*,
+    common::TensorResult,
+};
 
-// #[test]
-// fn tensor_create_0d() {
-//     let tensor = Tensor::new(vec![], |_| { 123.0 });
-//     assert_eq!(tensor.rank(), 0, "Tensor for scalar is wrong");
-//     assert_eq!(tensor.value().unwrap(), 123.0, "Invalid scalar value");
-// }
+#[test]
+fn tensor_create_empty() {
+    let tensor = Tensor::<i32>::new(vec![], i32::default());
+    todo!()
+}
 
-// #[test]
-// fn tensor_create_1d() {
-//     let tensor = Tensor::new(vec![10], |indices| {
-//         let v = indices.first().unwrap();
-//         *v as TensorFloat
-//     });
-//     assert_eq!(tensor.rank(), 1, "Tensor dimension for vector is wrong");
-//     for i in 0..10 {
-//         assert_eq!(tensor[i].value().unwrap(), i as TensorFloat, "Incorrect tensor value in vector representation");
-//     }
-// }
+#[test]
+fn tensor_create_1d() -> TensorResult<()> {
+    let arr = vec![1i32, 2, 3, 4, 5];
+    let tensor = Tensor::vector(&arr)?;
+    for i in 0..arr.len() {
+        assert_eq!(tensor.get(&vec![i])?, arr[i], "Incorrect tensor value in vector representation");
+    }
+    Ok(())
+}
 
-// #[test]
-// fn tensor_create_2d() {
-//  //   env::set_var("RUST_BACKTRACE", "1");
+#[test]
+fn tensor_create_2d() -> TensorResult<()> {
+ //   env::set_var("RUST_BACKTRACE", "1");
 
-//     let matrix = vec![
-//         vec![1.0, 0.0, 1.0],
-//         vec![2.0, 1.0, 1.0],
-//         vec![0.0, 1.0, 1.0],
-//         vec![1.0, 1.0, 2.0],
-//     ];
+    let matrix = vec![
+        vec![1.0, 0.0, 1.0],
+        vec![2.0, 1.0, 1.0],
+        vec![0.0, 1.0, 1.0],
+        vec![1.0, 1.0, 2.0],
+    ];
+    let tensor = Tensor::matrix(&matrix)?;
+    todo!();
 //     let tensor = Tensor::new(vec![4, 3], |indicies| {
 //         let row = indicies[0];
 //         let col = indicies[1];
@@ -46,7 +46,7 @@
 //             assert_eq!(tensor[i][j].value().unwrap(), matrix[i][j], "Tensor for matrix filled incorrectly");
 //         }
 //     }
-// }
+}
 
 // #[test]
 // fn tensor_create_3d() {
