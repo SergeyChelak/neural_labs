@@ -1,2 +1,3 @@
-pub mod tensor_error;
+pub mod common;
+pub mod tensor_shape;
 pub mod tensor;
