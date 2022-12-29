@@ -5,6 +5,7 @@ pub type TensorBounds = Vec<usize>;
 pub enum TensorError {
     IndexOutOfBounds,
     IncompatibleTensorShapes,
+    IncorrectShape,
 }
 
 pub type TensorResult<T> = Result<T, TensorError>;

@@ -26,7 +26,6 @@ fn tensor_create_1d() -> TensorResult<()> {
 #[test]
 fn tensor_create_2d() -> TensorResult<()> {
  //   env::set_var("RUST_BACKTRACE", "1");
-
     let matrix = vec![
         vec![1.0, 0.0, 1.0],
         vec![2.0, 1.0, 1.0],
@@ -34,18 +33,12 @@ fn tensor_create_2d() -> TensorResult<()> {
         vec![1.0, 1.0, 2.0],
     ];
     let tensor = Tensor::matrix(&matrix)?;
-    todo!();
-//     let tensor = Tensor::new(vec![4, 3], |indicies| {
-//         let row = indicies[0];
-//         let col = indicies[1];
-//         matrix[row][col]
-//     });
-//     assert_eq!(tensor.rank(), 2, "Tensor dimensions for matrix are wrong");
-//     for i in 0..matrix.len() {
-//         for j in 0..matrix[i].len() {
-//             assert_eq!(tensor[i][j].value().unwrap(), matrix[i][j], "Tensor for matrix filled incorrectly");
-//         }
-//     }
+    for i in 0..matrix.len() {
+        for j in 0..matrix[i].len() {
+            assert_eq!(tensor.get(&vec![i, j])?, matrix[i][j], "Tensor for matrix filled incorrectly");
+        }
+    }
+    Ok(())
 }
 
 // #[test]
