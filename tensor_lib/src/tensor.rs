@@ -1,82 +1,72 @@
+use std::ops::Deref;
+
 use super::tensor_error::*;
 
-pub type TensorFloat = f64;
-pub type TensorPosition = Vec<usize>;
-pub type TensorSize = Vec<usize>;
+pub type TensorIndex = Vec<usize>;
+pub type TensorShape = Vec<usize>;
 
-static ZERO_DIMENSION: TensorSize = vec![];
-
-pub enum Tensor {
-    Scalar(TensorFloat),
-    Array(Vec<Tensor>, TensorSize),
+pub struct Tensor<T> {
+    buffer: Vec<T>,
+    shape: TensorShape,
 }
 
-impl Tensor {
-    pub fn new<P>(dimensions: TensorSize, producer: P) -> Tensor where P: Fn(&TensorPosition) -> TensorFloat {
-        let mut location: TensorPosition = TensorPosition::with_capacity(dimensions.len());
-        Self::tensor(&mut location, &dimensions[..], &producer)
+impl<T: Copy> Tensor<T> {
+    pub fn new() -> Self {
+        todo!("create new tesor filled with zeros")
+    }
+        
+    pub fn element_wise<F>(&mut self, func: F) where F: Fn(T) -> T {
+        self.buffer.iter_mut().for_each(|elem| {
+            *elem = func(*elem);
+        });
     }
 
-    fn tensor<P>(location: &mut TensorPosition, dimensions: &[usize], producer: &P) -> Tensor where P: Fn(&TensorPosition) -> TensorFloat {
-        if dimensions.len() > 0 {
-            let dim = *dimensions.first().unwrap();
-            let child_dimension = &dimensions[1..];
-            let mut child_tensors: Vec<Tensor> = Vec::with_capacity(dim);
-            for i in 0..dim {
-                location.push(i);
-                let tensor = Self::tensor(location, child_dimension, producer);
-                _ = location.pop();
-                child_tensors.push(tensor);
-            }
-            Tensor::Array(child_tensors, dimensions.to_vec())
+    pub fn pair_wise<F>(&self, other: &Tensor<T>) -> TensorResult<Tensor<T>> where F: Fn(T) -> T {
+        todo!("tensor pair wise")
+    }
+
+    pub fn get(&self, index: &TensorIndex) -> TensorResult<T> {
+        if self.is_valid_index(index) {
+            Ok(self.get_unchecked(index))
         } else {
-            Tensor::Scalar(producer(location))
+            Err(TensorError::IndexOutOfBounds)
         }
     }
 
-    pub fn dimensions(&self) -> &TensorSize {
-        match self {
-            Tensor::Array(_, size) => &size,
-            _ => &ZERO_DIMENSION,
+    pub fn get_unchecked(&self, index: &TensorIndex) -> T {
+        todo!("get unchecked tensor element")
+    }
+
+    pub fn set(&mut self, index: &TensorIndex, value: T) -> TensorResult<()> {
+        if self.is_valid_index(index) {
+            Ok(self.set_unchecked(index, value))
+        } else {
+            Err(TensorError::IndexOutOfBounds)
         }
     }
 
-    fn is_valid_position(&self, position: &TensorPosition) -> bool {
-        let dim_len = self.dimensions().len();
-        if dim_len != position.len() {
-            return false;
-        }
-        for i in 0..dim_len {
-            if self.dimensions()[i] <= position[i] {
-                return false;
-            }
-        }
-        true
+    pub fn set_unchecked(&mut self, index: &TensorIndex, value: T) {
+        todo!("set unchecked tensor element")
+    }
+
+    fn buffer_index(&self, index: &TensorIndex) -> usize {
+        todo!("internal buffer index")
+    }
+
+    pub fn is_same_shape(&self, other: &Tensor<T>) -> bool {
+        todo!("Validate shape")
+    }
+
+    pub fn is_valid_index(&self, index: &TensorIndex) -> bool {
+        todo!("Validate index")
     }
 
     #[inline(always)]
     pub fn rank(&self) -> usize {
-        self.dimensions().len()
-    }
-
-    #[inline(always)]
-    pub fn value(&self) -> Option<TensorFloat> {
-        if let Tensor::Scalar(value) = self {
-            Some(*value)
-        } else {
-            None
-        }
+        self.shape.len()
     }
 }
 
-impl std::ops::Index<usize> for Tensor {
-    type Output = Tensor;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        if let Tensor::Array(vector, _) = self {
-            &vector[index]
-        } else {
-            panic!()
-        }
-    }
+impl<T: Copy> Tensor<T> {
+    
 }
