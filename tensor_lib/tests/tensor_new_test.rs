@@ -7,12 +7,6 @@ use tensor_lib::{
     common::TensorResult,
 };
 
-// #[test]
-// fn tensor_create_empty() {
-//     let tensor = Tensor::<i32>::new(vec![], i32::default());
-//     todo!()
-// }
-
 #[test]
 fn tensor_create_1d() -> TensorResult<()> {
     let arr = vec![1i32, 2, 3, 4, 5];

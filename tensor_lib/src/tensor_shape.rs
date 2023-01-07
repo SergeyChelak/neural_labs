@@ -4,48 +4,39 @@ use super::common::*;
 pub struct TensorShape {
     shape: TensorBounds,
     offsets: TensorBounds,
+    absolute_offset: usize,
+    count: usize,
 }
 
 impl TensorShape {
     pub fn new(shape: TensorBounds) -> Self {
-        if shape.len() == 0 {
-            return Self::empty();
-        }
-        let shape_offsets = Self::shape_offsets(&shape);
+        let (count, offsets) = Self::shape_parameters(&shape);
         Self {
             shape,
-            offsets: shape_offsets
+            offsets,
+            absolute_offset: 0usize,
+            count,
         }
     }
 
-    pub fn empty() -> Self {
-        Self {
-            shape: vec![],
-            offsets: vec![],
-        }
-    }
-
-    fn shape_offsets(shape: &TensorBounds) -> TensorBounds {
+    fn shape_parameters(shape: &TensorBounds) -> (usize, TensorBounds) {
         let size = shape.len();
         if size == 0 {
-            return vec![];
+            return (0, vec![]);
         }
-        let mut result: TensorBounds = Vec::with_capacity(size);
-        result.push(1);
-        for i in 0..size-1 {
-            let rate = result[i] * shape[size - i - 1];
-            result.push(rate);
+        let mut offsets: TensorBounds = Vec::with_capacity(size);
+        offsets.push(1);
+        for i in 0..size {
+            let rate = offsets[i] * shape[size - i - 1];
+            offsets.push(rate);
         }
-        result.reverse();
-        result
+        let count = offsets.pop().unwrap_or(0);
+        offsets.reverse();
+        (count, offsets)
     }
 
     pub fn count(&self) -> usize {
-        if self.shape.len() > 0 {
-            self.shape.iter().fold(1, |acc, v| acc * v)
-        } else {
-            0
-        }
+        self.count
     }
 
     pub fn is_valid_index(&self, index: &TensorIndex) -> bool {
@@ -62,7 +53,7 @@ impl TensorShape {
         self.offsets.iter()
             .zip(index.iter())
             .map(|(offs, idx)| offs * idx)
-            .fold(0usize, |acc, v| acc + v)
+            .fold(self.absolute_offset, |acc, v| acc + v)
     }
 
     pub fn is_same_shape(&self, other: &TensorShape) -> bool {
@@ -73,6 +64,10 @@ impl TensorShape {
             .zip(other.shape.iter())
             .map(|(a, b)| a == b)
             .fold(true, |acc, v| acc && v)
+    }
+
+    pub fn absolute_bounds(&self) -> (usize, usize) {
+        (self.absolute_offset, self.absolute_offset + self.count)
     }
 
     #[inline(always)]
