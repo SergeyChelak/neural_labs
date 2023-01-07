@@ -42,20 +42,6 @@ impl<T: Copy> Tensor<T> {
     pub fn iter_mut(&mut self) -> IterMut<T> {
         self.buffer_mut().iter_mut()
     }
-        
-    pub fn pair_wise<F>(&self, other: &Tensor<T>, func: F) -> TensorResult<Self> where F: Fn(T, T) -> T {
-        if self.shape.is_same_shape(&other.shape) {
-            return Err(TensorError::IncompatibleTensorShapes);
-        }
-        let buffer: Vec<T> = self.iter()
-            .zip(other.buffer_ref.iter())
-            .map(|(slf, othr)| func(*slf, *othr))
-            .collect();
-        Ok(Self {
-            buffer_ref: Rc::new(buffer),
-            shape: self.shape.clone(),
-        })
-    }
 
     pub fn get(&self, index: &TensorIndex) -> TensorResult<T> {
         if self.shape.is_valid_index(index) {
@@ -90,6 +76,22 @@ impl<T: Copy> ElementWise<T> for Tensor<T>  {
         self.iter_mut().for_each(|elem| {
             *elem = func(*elem);
         });
+    }
+}
+
+impl <T: Copy> PairWise<T> for Tensor<T> {
+    fn pair_wise<F>(&self, other: &Tensor<T>, func: F) -> TensorResult<Self> where F: Fn(T, T) -> T {
+        if self.shape.is_same_shape(&other.shape) {
+            return Err(TensorError::IncompatibleTensorShapes);
+        }
+        let buffer: Vec<T> = self.iter()
+            .zip(other.buffer_ref.iter())
+            .map(|(slf, othr)| func(*slf, *othr))
+            .collect();
+        Ok(Self {
+            buffer_ref: Rc::new(buffer),
+            shape: self.shape.clone(),
+        })
     }
 }
 

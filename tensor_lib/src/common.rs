@@ -19,3 +19,7 @@ pub trait ElementWiseOperations<T: Copy> {
 
     fn div_assign(&mut self, rhs: T);
 }
+
+pub trait PairWise<T: Copy>: Sized {
+    fn pair_wise<F>(&self, other: &Self, func: F) -> TensorResult<Self> where F: Fn(T, T) -> T;
+}
