@@ -16,7 +16,7 @@ fn tensor_mul_assign() -> TensorResult<()> {
         vec![1.0, 1.0, 2.0],
     ];
     let mut tensor = Tensor::matrix(&matrix)?;
-    tensor.mul_assign(2.0);
+    _ = tensor.mul_assign(2.0);
 
     let expected = vec![
         vec![2.0, 0.0, 2.0],
@@ -43,7 +43,7 @@ fn tensor_div_assign() -> TensorResult<()> {
     ];
 
     let mut tensor = Tensor::matrix(&matrix)?;
-    tensor.div_assign(2.0);
+    _ = tensor.div_assign(2.0);
 
     let expected = vec![
         vec![1.0, 0.0, 1.0],

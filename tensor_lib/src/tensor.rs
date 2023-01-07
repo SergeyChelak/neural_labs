@@ -27,10 +27,13 @@ impl<T: Copy> Tensor<T> {
         &self.buffer_ref[beg..end]
     }
 
-    fn buffer_mut<'a>(&'a mut self) -> &'a mut [T] {
-        let buffer = Rc::get_mut(&mut self.buffer_ref).unwrap();
-        let (beg, end) = self.shape.absolute_bounds();
-        &mut buffer[beg..end]
+    fn buffer_mut<'a>(&'a mut self) -> TensorResult<&'a mut [T]> {
+        if let Some(buffer) = Rc::get_mut(&mut self.buffer_ref) {
+            let (beg, end) = self.shape.absolute_bounds();
+            Ok(&mut buffer[beg..end])
+        } else {
+            Err(TensorError::ModifyingSharedTensorBuffer)
+        }
     }
 
     #[inline(always)]
@@ -39,8 +42,10 @@ impl<T: Copy> Tensor<T> {
     }
 
     #[inline(always)]
-    pub fn iter_mut(&mut self) -> IterMut<T> {
-        self.buffer_mut().iter_mut()
+    pub fn iter_mut(&mut self) -> TensorResult<IterMut<T>> {
+        Ok(
+            self.buffer_mut()?.iter_mut()
+        )
     }
 
     pub fn get(&self, index: &TensorIndex) -> TensorResult<T> {
@@ -58,32 +63,34 @@ impl<T: Copy> Tensor<T> {
 
     pub fn set(&mut self, index: &TensorIndex, value: T) -> TensorResult<()> {
         if self.shape.is_valid_index(index) {
-            Ok(self.set_unchecked(index, value))
+            Ok(self.set_unchecked(index, value)?)
         } else {
             Err(TensorError::IndexOutOfBounds)
         }
     }
 
-    pub fn set_unchecked(&mut self, index: &TensorIndex, value: T) {
+    pub fn set_unchecked(&mut self, index: &TensorIndex, value: T) -> TensorResult<()> {
         let buf_idx = self.shape.buffer_index(index);
-        let buffer = self.buffer_mut();
+        let buffer = self.buffer_mut()?;
         buffer[buf_idx] = value;
+        Ok(())
     }
 
     pub fn nested_tensor(&self, index: &TensorIndex) -> TensorResult<Self> {
         let shape = self.shape.nested_shape(index)?;
         Ok(Self {
-            buffer_ref: self.buffer_ref.clone(),
+            buffer_ref: Rc::clone(&self.buffer_ref),
             shape,
         })
     }
 }
 
 impl<T: Copy> ElementWise<T> for Tensor<T>  {
-    fn element_wise<F>(&mut self, func: F) where F: Fn(T) -> T {
-        self.iter_mut().for_each(|elem| {
+    fn element_wise<F>(&mut self, func: F) -> TensorResult<()> where F: Fn(T) -> T {
+        self.iter_mut()?.for_each(|elem| {
             *elem = func(*elem);
         });
+        Ok(())
     }
 }
 
@@ -104,11 +111,11 @@ impl <T: Copy> PairWise<T> for Tensor<T> {
 }
 
 impl<T: Copy + Num> Tensor<T> {
-    pub fn mul_assign(&mut self, rhs: T) {
-        self.element_wise(|value| value * rhs);
+    pub fn mul_assign(&mut self, rhs: T) -> TensorResult<()> {
+        self.element_wise(|value| value * rhs)
     }
 
-    pub fn div_assign(&mut self, rhs: T) {
-        self.element_wise(|value| value / rhs);
+    pub fn div_assign(&mut self, rhs: T) -> TensorResult<()> {
+        self.element_wise(|value| value / rhs)
     }
 }

@@ -1,3 +1,8 @@
+use tensor_lib::{
+    tensor::*,
+    common::*,
+};
+
 fn main() {
-    println!("Here is a good place for the cool things");
+    // no op
 }

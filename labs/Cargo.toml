@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-matrix_lib = { path = "../matrix_lib" }
+tensor_lib = { path = "../tensor_lib" }
 network_lib = { path = "../network_lib" }
