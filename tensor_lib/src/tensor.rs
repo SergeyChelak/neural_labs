@@ -69,6 +69,14 @@ impl<T: Copy> Tensor<T> {
         let buffer = self.buffer_mut();
         buffer[buf_idx] = value;
     }
+
+    pub fn nested_tensor(&self, index: &TensorIndex) -> TensorResult<Self> {
+        let shape = self.shape.nested_shape(index)?;
+        Ok(Self {
+            buffer_ref: self.buffer_ref.clone(),
+            shape,
+        })
+    }
 }
 
 impl<T: Copy> ElementWise<T> for Tensor<T>  {

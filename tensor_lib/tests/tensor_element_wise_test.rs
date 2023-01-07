@@ -25,9 +25,9 @@ fn tensor_mul_assign() -> TensorResult<()> {
         vec![2.0, 2.0, 4.0],
     ];
 
-    for i in 0..matrix.len() {
-        for j in 0..matrix[i].len() {
-            assert_eq!(tensor.get(&vec![i, j])?, expected[i][j], "Tensor for matrix filled incorrectly");
+    for i in 0..expected.len() {
+        for j in 0..expected[i].len() {
+            assert_eq!(tensor.get(&vec![i, j])?, expected[i][j], "Tensor mul_assign implemented incorrectly");
         }
     }
     Ok(())
@@ -54,7 +54,7 @@ fn tensor_div_assign() -> TensorResult<()> {
 
     for i in 0..matrix.len() {
         for j in 0..matrix[i].len() {
-            assert_eq!(tensor.get(&vec![i, j])?, expected[i][j], "Tensor for matrix filled incorrectly");
+            assert_eq!(tensor.get(&vec![i, j])?, expected[i][j], "Tensor div_assign implemented incorrectly");
         }
     }
     Ok(())

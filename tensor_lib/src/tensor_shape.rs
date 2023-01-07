@@ -10,11 +10,15 @@ pub struct TensorShape {
 
 impl TensorShape {
     pub fn new(shape: TensorBounds) -> Self {
+        Self::new_with_offset(shape, 0)
+    }
+
+    fn new_with_offset(shape: TensorBounds, absolute_offset: usize) -> Self {
         let (count, offsets) = Self::shape_parameters(&shape);
         Self {
             shape,
             offsets,
-            absolute_offset: 0usize,
+            absolute_offset,
             count,
         }
     }
@@ -53,7 +57,7 @@ impl TensorShape {
         self.offsets.iter()
             .zip(index.iter())
             .map(|(offs, idx)| offs * idx)
-            .fold(self.absolute_offset, |acc, v| acc + v)
+            .fold(0, |acc, v| acc + v)
     }
 
     pub fn is_same_shape(&self, other: &TensorShape) -> bool {
@@ -78,5 +82,16 @@ impl TensorShape {
     #[inline(always)]
     pub fn rank(&self) -> usize {
         self.shape.len()
+    }
+
+    pub fn nested_shape(&self, index: &TensorIndex) -> TensorResult<Self> {
+        let len = index.len();
+        if len < self.shape.len() {
+            let new_shape = self.shape[len..].to_owned();
+            let new_offset = self.absolute_offset + self.buffer_index(index);
+            Ok(Self::new_with_offset(new_shape, new_offset))
+        } else {
+            Err(TensorError::IncorrectShape)
+        }
     }
 }
