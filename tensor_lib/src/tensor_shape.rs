@@ -14,7 +14,7 @@ impl TensorShape {
     }
 
     fn new_with_offset(shape: TensorBounds, absolute_offset: usize) -> Self {
-        let (count, offsets) = Self::shape_parameters(&shape);
+        let (count, offsets) = Self::get_shape_parameters(&shape);
         Self {
             shape,
             offsets,
@@ -23,7 +23,7 @@ impl TensorShape {
         }
     }
 
-    fn shape_parameters(shape: &TensorBounds) -> (usize, TensorBounds) {
+    fn get_shape_parameters(shape: &TensorBounds) -> (usize, TensorBounds) {
         let size = shape.len();
         if size == 0 {
             return (0, vec![]);
@@ -93,5 +93,13 @@ impl TensorShape {
         } else {
             Err(TensorError::IncorrectShape)
         }
+    }
+}
+
+impl std::ops::Index<usize> for TensorShape {
+    type Output = usize;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.shape[index]
     }
 }

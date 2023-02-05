@@ -3,6 +3,8 @@ use super::{
     common::*,
 };
 
+use rand::Rng;
+
 impl<T: Copy + Default> Tensor<T> {
     pub fn vector(arr: &Vec<T>) -> TensorResult<Self> {
         let size = shape1d(arr)?;
@@ -35,6 +37,21 @@ impl<T: Copy + Default> Tensor<T> {
             }
         }
         Ok(tensor)
+    }
+}
+
+impl Tensor<f64> {
+    pub fn rand(bounds: TensorBounds) -> Self {
+        let mut tensor = Self::new(bounds, f64::default());
+        _ = tensor.randomize();
+        tensor
+    }
+
+    fn randomize(&mut self) -> TensorResult<()> {
+        self.element_wise(|_| {
+            let mut rng = rand::thread_rng();
+            rng.gen::<f64>()
+        })
     }
 }
 

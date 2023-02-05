@@ -119,3 +119,27 @@ impl<T: Copy + Num> Tensor<T> {
         self.element_wise(|value| value / rhs)
     }
 }
+
+impl<T: Copy + Num + Default> Tensor<T> {
+    pub fn product2d(&self, rhs: &Self) -> TensorResult<Self> {
+        if self.shape.rank() != 2 || rhs.shape.rank() != 2 {
+            return Err(TensorError::IncorrectShape);
+        }
+        let (rows, fc) = (self.shape[0], self.shape[1]);
+        let (sr, cols) = (rhs.shape[0], rhs.shape[1]);
+        if fc != sr {
+            return Err(TensorError::IncompatibleTensorShapes);
+        }
+        let mut tensor = Self::new(vec![rows, cols], T::default());
+        for i in 0..rows {
+            for j in 0..cols {
+                let mut sum = tensor.get_unchecked(&vec![i,j]);
+                for k in 0..fc {
+                    sum = sum + self.get_unchecked(&vec![i, k]) * rhs.get_unchecked(&vec![k, j]);
+                }
+                tensor.set_unchecked(&vec![i,j], sum)?;
+            }
+        }
+        Ok(tensor)
+    }
+}
